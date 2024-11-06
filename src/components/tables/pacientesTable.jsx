@@ -59,8 +59,7 @@ const PacienteTable = ({ drawerOpen }) => {
   const addPatient = async () => {
     try {
       const response = await createPaciente(formData);
-      fetchPatients();
-      setPatients([...patients, response.data]);
+      await fetchPatients(); // Llama a fetchPatients para actualizar la tabla
       setFormData({
         nombre: "",
         apellido: "",
