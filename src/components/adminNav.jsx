@@ -51,17 +51,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function PersistentDrawerLeft({ onMenuSelect }) {
+export default function PersistentDrawerLeft({ onMenuSelect, open, toggleSidebar }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
 
   const menuItems = ['Pacientes', 'Medicos', 'Enfermeros', 'Cerrar Sesion'];
 
@@ -73,7 +64,7 @@ export default function PersistentDrawerLeft({ onMenuSelect }) {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={toggleSidebar}
             edge="start"
             sx={[
               {
@@ -105,7 +96,7 @@ export default function PersistentDrawerLeft({ onMenuSelect }) {
         open={open}
       >
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose} sx={{ color: 'white' }}>
+          <IconButton onClick={toggleSidebar} sx={{ color: 'white' }}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
@@ -116,7 +107,7 @@ export default function PersistentDrawerLeft({ onMenuSelect }) {
               key={text}
               disablePadding
               onClick={() => {
-                onMenuSelect(text); // Llama a la función de callback con el valor seleccionado
+                onMenuSelect(text);
               }}
             >
               <ListItemButton>
