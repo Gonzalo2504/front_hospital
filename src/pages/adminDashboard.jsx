@@ -27,6 +27,7 @@ function App() {
       case 'Enfermeros':
         return <EnfermeroTable drawerOpen={drawerOpen} />;
       case 'Cerrar Sesion':
+        localStorage.removeItem('token');
         navigate('/');
       default:
         return (
