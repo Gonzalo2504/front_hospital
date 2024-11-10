@@ -96,7 +96,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
     closeModal();
   };
 
-  const deleteEnfermero = async (id) => {
+  const deleteEnfermerro = async (id) => {
     const enfermero = enfermeros.find((e) => e.id === id);
     const confirmDelete = window.confirm(
       `Desea borrar al enfermero ${enfermero.nombre} ${enfermero.apellido} DNI ${enfermero.dni}?`
@@ -265,7 +265,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
                       Editar
                     </button>
                     <button
-                      onClick={() => deleteEnfermero(enfermero.id)}
+                      onClick={() => deleteEnfermerro(enfermero.id)}
                       style={{
                         backgroundColor: "#dc3545",
                         color: "white",
