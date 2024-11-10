@@ -100,7 +100,7 @@ const MedicoTable = ({ drawerOpen }) => {
     closeModal();
   };
 
-  const deleteMedicoDetails = async (id) => {
+  const deleteMedic = async (id) => {
     const medico = medics.find((m) => m.id === id);
     const confirmDelete = window.confirm(
       `Desea borrar al médico ${medico.nombre} ${medico.apellido} DNI ${medico.dni}?`
