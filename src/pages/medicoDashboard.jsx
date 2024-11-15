@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PersistentDrawerLeft from '../components/adminNav';
+import PersistentDrawerLeft from '../components/navs/medicoNav';
 import PacienteTable from '../components/tables/pacientesTable';
 import { useNavigate } from 'react-router-dom';
 import MedicoTable from '../components/tables/medicosTable';

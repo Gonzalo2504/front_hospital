@@ -106,7 +106,7 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Panel Administrativo
+            Panel del Medico
           </Typography>
         </Toolbar>
       </AppBar>
@@ -135,7 +135,7 @@ export default function PersistentDrawerLeft() {
         </DrawerHeader>
         <Divider sx={{ borderColor: 'white' }} />
         <List>
-          {['Pacientes', 'Medicos', 'Enfermeros', 'Cerrar Sesion'].map((text, index) => (
+          {['Codigo Rojo', 'Codigo Amarillo', 'Codigo Verde', 'Cerrar Sesion'].map((text, index) => (
             <ListItem
               key={text}
               disablePadding
