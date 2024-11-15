@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import {
-  getMedicos,
-  deleteMedico,
-  updateMedico,
-  createMedico,
-} from "../../api/endpoints/medicos";
+  getPacientes,
+  deletePaciente,
+  updatePaciente,
+  createPaciente,
+} from "../../../api/endpoints/pacientes";
 import ReactPaginate from "react-paginate";
 
 const customStyles = {
@@ -24,19 +24,18 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
-const MedicoTable = ({ drawerOpen }) => {
-  const [medics, setMedics] = useState([]);
-  const [editingMedics, setEditingMedics] = useState(null);
+const PacienteTable = ({ drawerOpen }) => {
+  const [patients, setPatients] = useState([]);
+  const [editingPatient, setEditingPatient] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
     dni: "",
-    especialidad: "",
-    email: "",
+    fecha_nacimiento: "",
+    direccion: "",
     telefono: "",
-    usuario: "",
-    contrasena: "",
-    rol_id: 2,
+    email: "",
+    estado_atencion: "",
   });
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -44,83 +43,81 @@ const MedicoTable = ({ drawerOpen }) => {
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    fetchMedics();
+    fetchPatients();
   }, []);
 
-  const fetchMedics = async () => {
+  const fetchPatients = async () => {
     try {
-      const response = await getMedicos();
-      setMedics(response);
+      const response = await getPacientes();
+      setPatients(response);
       setPageCount(Math.ceil(response.length / 10));
     } catch (error) {
-      console.error("Error fetching medics:", error);
+      console.error("Error fetching patients:", error);
     }
   };
 
-  const addMedic = async () => {
+  const addPatient = async () => {
     try {
-      const response = await createMedico(formData);
-      await fetchMedics(); // Llama a fetchMedics para actualizar la tabla
+      const response = await createPaciente(formData);
+      await fetchPatients(); // Llama a fetchPatients para actualizar la tabla
       setFormData({
         nombre: "",
         apellido: "",
         dni: "",
-        especialidad: "",
-        email: "",
+        fecha_nacimiento: "",
+        direccion: "",
         telefono: "",
-        usuario: "",
-        contrasena: "",
-        rol_id: 2,
+        email: "",
+        estado_atencion: "",
       });
     } catch (error) {
-      console.error("Error adding medic:", error);
+      console.error("Error adding patient:", error);
     }
     closeModal();
   };
 
-  const updateMedicoDetails = async (id) => {
+  const updatePatient = async (id) => {
     try {
-      await updateMedico(id, formData);
-      fetchMedics(); // Llama a fetchMedics para actualizar la tabla
-      setEditingMedics(null);
+      await updatePaciente(id, formData);
+      fetchPatients(); // Llama a fetchPatients para actualizar la tabla
+      setEditingPatient(null);
       setFormData({
         nombre: "",
         apellido: "",
         dni: "",
-        especialidad: "",
-        email: "",
+        fecha_nacimiento: "",
+        direccion: "",
         telefono: "",
-        usuario: "",
-        contrasena: "",
-        rol_id: 2,
+        email: "",
+        estado_atencion: "",
       });
     } catch (error) {
-      console.error("Error updating medic:", error);
+      console.error("Error updating patient:", error);
     }
     closeModal();
   };
 
-  const deleteMedic = async (id) => {
-    const medico = medics.find((m) => m.id === id);
+  const deletePatient = async (id) => {
+    const patient = patients.find((p) => p.id === id);
     const confirmDelete = window.confirm(
-      `Desea borrar al médico ${medico.nombre} ${medico.apellido} DNI ${medico.dni}?`
+      `Desea borrar al paciente ${patient.nombre} ${patient.apellido} DNI ${patient.dni}?`
     );
     if (confirmDelete) {
       try {
-        await deleteMedico(id);
-        setMedics(medics.filter((m) => m.id !== id));
+        await deletePaciente(id);
+        setPatients(patients.filter((p) => p.id !== id));
       } catch (error) {
-        console.error("Error deleting medico:", error);
+        console.error("Error deleting patient:", error);
       }
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editingMedics) {
-      updateMedicoDetails(editingMedics.id);
+    if (editingPatient) {
+      updatePatient(editingPatient.id);
     } else {
-      addMedic();
+      addPatient();
     }
   };
 
@@ -131,9 +128,9 @@ const MedicoTable = ({ drawerOpen }) => {
     });
   };
 
-  const handleEdit = (medic) => {
-    setEditingMedics(medic);
-    setFormData(medic);
+  const handleEdit = (patient) => {
+    setEditingPatient(patient);
+    setFormData(patient);
     setIsCreating(false);
     openModal();
   };
@@ -146,18 +143,17 @@ const MedicoTable = ({ drawerOpen }) => {
     setModalIsOpen(false);
   };
 
-  const handleCreateMedic = () => {
-    setEditingMedics(null);
+  const handleCreatePatient = () => {
+    setEditingPatient(null);
     setFormData({
       nombre: "",
       apellido: "",
       dni: "",
-      especialidad: "",
-      email: "",
+      fecha_nacimiento: "",
+      direccion: "",
       telefono: "",
-      usuario: "",
-      contrasena: "",
-      rol_id: 2,
+      email: "",
+      estado_atencion: "",
     });
     setIsCreating(true);
     openModal();
@@ -179,7 +175,7 @@ const MedicoTable = ({ drawerOpen }) => {
       }}
     >
       <button
-        onClick={handleCreateMedic}
+        onClick={handleCreatePatient}
         style={{
           backgroundColor: "#007bff",
           color: "white",
@@ -189,7 +185,7 @@ const MedicoTable = ({ drawerOpen }) => {
           borderRadius: "4px",
         }}
       >
-        Crear Médico
+        Crear Paciente
       </button>
       <h2
         style={{
@@ -199,7 +195,7 @@ const MedicoTable = ({ drawerOpen }) => {
           color: "#333",
         }}
       >
-        Médicos
+        Pacientes
       </h2>
       <table
         style={{
@@ -210,8 +206,8 @@ const MedicoTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
-            {medics.length > 0 &&
-              Object.keys(medics[0] || {}).map((key) => (
+            {patients.length > 0 &&
+              Object.keys(patients[0] || {}).map((key) => (
                 <th
                   key={key}
                   style={{
@@ -237,17 +233,17 @@ const MedicoTable = ({ drawerOpen }) => {
           </tr>
         </thead>
         <tbody>
-          {medics.length > 0 &&
-            medics
+          {patients.length > 0 &&
+            patients
               .slice(currentPage * 10, (currentPage + 1) * 10)
-              .map((medico) => (
+              .map((patient) => (
                 <tr
-                  key={medico.id}
+                  key={patient.id}
                   style={{
-                    backgroundColor: medico.id % 2 === 0 ? "#f2f2f2" : "white",
+                    backgroundColor: patient.id % 2 === 0 ? "#f2f2f2" : "white",
                   }}
                 >
-                  {Object.values(medico || {}).map((value, index) => (
+                  {Object.values(patient || {}).map((value, index) => (
                     <td
                       key={index}
                       style={{ padding: "10px", border: "1px solid #ddd" }}
@@ -257,7 +253,7 @@ const MedicoTable = ({ drawerOpen }) => {
                   ))}
                   <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                     <button
-                      onClick={() => handleEdit(medico)}
+                      onClick={() => handleEdit(patient)}
                       style={{
                         backgroundColor: "#28a745",
                         color: "white",
@@ -270,7 +266,7 @@ const MedicoTable = ({ drawerOpen }) => {
                       Editar
                     </button>
                     <button
-                      onClick={() => deleteMedic(medico.id)}
+                      onClick={() => deletePatient(patient.id)}
                       style={{
                         backgroundColor: "#dc3545",
                         color: "white",
@@ -352,7 +348,7 @@ const MedicoTable = ({ drawerOpen }) => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
-        contentLabel={isCreating ? "Crear Médico" : "Editar Médico"}
+        contentLabel={isCreating ? "Crear Paciente" : "Editar Paciente"}
       >
         <h2
           style={{
@@ -362,7 +358,7 @@ const MedicoTable = ({ drawerOpen }) => {
             color: "#333",
           }}
         >
-          {isCreating ? "Crear Médico" : "Editar Médico"}
+          {isCreating ? "Crear Paciente" : "Editar Paciente"}
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -373,10 +369,39 @@ const MedicoTable = ({ drawerOpen }) => {
             width: "100%",
           }}
         >
-          {Object.keys(formData || {})
-            .filter((key) => key !== "fecha_nacimiento")
-            .map((key) => (
-              <div key={key} style={{ marginBottom: "15px", width: "100%" }}>
+          {Object.keys(formData || {}).map((key) => (
+            <div key={key} style={{ marginBottom: "15px", width: "100%" }}>
+              {key === "fecha_nacimiento" ? (
+                <input
+                  type="date"
+                  name={key}
+                  value={formData[key] || ""}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                  }}
+                />
+              ) : key === "estado_atencion" ? (
+                <select
+                  name={key}
+                  value={formData[key] || ""}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <option value="en espera">En espera</option>
+                  <option value="atendido">Atendido</option>
+                </select>
+              ) : (
                 <input
                   type="text"
                   name={key}
@@ -391,8 +416,9 @@ const MedicoTable = ({ drawerOpen }) => {
                     borderRadius: "4px",
                   }}
                 />
-              </div>
-            ))}
+              )}
+            </div>
+          ))}
           <button
             type="submit"
             style={{
@@ -426,5 +452,4 @@ const MedicoTable = ({ drawerOpen }) => {
   );
 };
 
-export default MedicoTable;
-
+export default PacienteTable;

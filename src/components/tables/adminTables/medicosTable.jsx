@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import {
-  getEnfermeros,
-  deleteEnfermero,
-  updateEnfermero,
-  createEnfermero,
-} from "../../api/endpoints/enfermeros";
+  getMedicos,
+  deleteMedico,
+  updateMedico,
+  createMedico,
+} from "../../../api/endpoints/medicos";
 import ReactPaginate from "react-paginate";
 
 const customStyles = {
@@ -24,18 +24,19 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
-const EnfermeroTable = ({ drawerOpen }) => {
-  const [enfermeros, setEnfermeros] = useState([]);
-  const [editingEnfermeros, setEditingEnfermeros] = useState(null);
+const MedicoTable = ({ drawerOpen }) => {
+  const [medics, setMedics] = useState([]);
+  const [editingMedics, setEditingMedics] = useState(null);
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
     dni: "",
+    especialidad: "",
     email: "",
     telefono: "",
     usuario: "",
     contrasena: "",
-    rol_id: 3,
+    rol_id: 2,
   });
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -43,80 +44,83 @@ const EnfermeroTable = ({ drawerOpen }) => {
   const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
-    fetchEnfermeros();
+    fetchMedics();
   }, []);
 
-  const fetchEnfermeros = async () => {
+  const fetchMedics = async () => {
     try {
-      const response = await getEnfermeros();
-      setEnfermeros(response);
+      const response = await getMedicos();
+      setMedics(response);
       setPageCount(Math.ceil(response.length / 10));
     } catch (error) {
-      console.error("Error fetching enfermeros:", error);
+      console.error("Error fetching medics:", error);
     }
   };
 
-  const addEnfermero = async () => {
+  const addMedic = async () => {
     try {
-      const response = await createEnfermero(formData);
-      await fetchEnfermeros(); // Llama a fetchEnfermeros para actualizar la tabla
+      const response = await createMedico(formData);
+      await fetchMedics(); // Llama a fetchMedics para actualizar la tabla
       setFormData({
         nombre: "",
         apellido: "",
         dni: "",
-        telefono: "",
-        usuario: "",
-        contrasena: "",
-        rol_id: 3,
-      });
-    } catch (error) {
-      console.error("Error adding enfermero:", error);
-    }
-    closeModal();
-  };
-
-  const updateEnfermeroDetails = async (id) => {
-    try {
-      await updateEnfermero(id, formData);
-      fetchEnfermeros(); // Llama a fetchEnfermeros para actualizar la tabla
-      setEditingEnfermeros(null);
-      setFormData({
-        nombre: "",
-        apellido: "",
-        dni: "",
+        especialidad: "",
         email: "",
         telefono: "",
         usuario: "",
         contrasena: "",
-        rol_id: 3,
+        rol_id: 2,
       });
     } catch (error) {
-      console.error("Error updating enfermero:", error);
+      console.error("Error adding medic:", error);
     }
     closeModal();
   };
 
-  const deleteEnfermerro = async (id) => {
-    const enfermero = enfermeros.find((e) => e.id === id);
+  const updateMedicoDetails = async (id) => {
+    try {
+      await updateMedico(id, formData);
+      fetchMedics(); // Llama a fetchMedics para actualizar la tabla
+      setEditingMedics(null);
+      setFormData({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        especialidad: "",
+        email: "",
+        telefono: "",
+        usuario: "",
+        contrasena: "",
+        rol_id: 2,
+      });
+    } catch (error) {
+      console.error("Error updating medic:", error);
+    }
+    closeModal();
+  };
+
+  const deleteMedic = async (id) => {
+    const medico = medics.find((m) => m.id === id);
     const confirmDelete = window.confirm(
-      `Desea borrar al enfermero ${enfermero.nombre} ${enfermero.apellido} DNI ${enfermero.dni}?`
+      `Desea borrar al médico ${medico.nombre} ${medico.apellido} DNI ${medico.dni}?`
     );
     if (confirmDelete) {
       try {
-        await deleteEnfermero(id);
-        setEnfermeros(enfermeros.filter((e) => e.id !== id));
+        await deleteMedico(id);
+        setMedics(medics.filter((m) => m.id !== id));
       } catch (error) {
-        console.error("Error deleting enfermero:", error);
+        console.error("Error deleting medico:", error);
       }
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editingEnfermeros) {
-      updateEnfermeroDetails(editingEnfermeros.id);
+    if (editingMedics) {
+      updateMedicoDetails(editingMedics.id);
     } else {
-      addEnfermero();
+      addMedic();
     }
   };
 
@@ -127,9 +131,9 @@ const EnfermeroTable = ({ drawerOpen }) => {
     });
   };
 
-  const handleEdit = (enfermero) => {
-    setEditingEnfermeros(enfermero);
-    setFormData(enfermero);
+  const handleEdit = (medic) => {
+    setEditingMedics(medic);
+    setFormData(medic);
     setIsCreating(false);
     openModal();
   };
@@ -142,17 +146,18 @@ const EnfermeroTable = ({ drawerOpen }) => {
     setModalIsOpen(false);
   };
 
-  const handleCreateEnfermero = () => {
-    setEditingEnfermeros(null);
+  const handleCreateMedic = () => {
+    setEditingMedics(null);
     setFormData({
       nombre: "",
       apellido: "",
       dni: "",
+      especialidad: "",
       email: "",
       telefono: "",
       usuario: "",
       contrasena: "",
-      rol_id: 3,
+      rol_id: 2,
     });
     setIsCreating(true);
     openModal();
@@ -174,7 +179,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
       }}
     >
       <button
-        onClick={handleCreateEnfermero}
+        onClick={handleCreateMedic}
         style={{
           backgroundColor: "#007bff",
           color: "white",
@@ -184,7 +189,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
           borderRadius: "4px",
         }}
       >
-        Crear Enfermero
+        Crear Médico
       </button>
       <h2
         style={{
@@ -194,7 +199,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
           color: "#333",
         }}
       >
-        Enfermeros
+        Médicos
       </h2>
       <table
         style={{
@@ -205,8 +210,8 @@ const EnfermeroTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
-            {enfermeros.length > 0 &&
-              Object.keys(enfermeros[0] || {}).map((key) => (
+            {medics.length > 0 &&
+              Object.keys(medics[0] || {}).map((key) => (
                 <th
                   key={key}
                   style={{
@@ -232,17 +237,17 @@ const EnfermeroTable = ({ drawerOpen }) => {
           </tr>
         </thead>
         <tbody>
-          {enfermeros.length > 0 &&
-            enfermeros
+          {medics.length > 0 &&
+            medics
               .slice(currentPage * 10, (currentPage + 1) * 10)
-              .map((enfermero) => (
+              .map((medico) => (
                 <tr
-                  key={enfermero.id}
+                  key={medico.id}
                   style={{
-                    backgroundColor: enfermero.id % 2 === 0 ? "#f2f2f2" : "white",
+                    backgroundColor: medico.id % 2 === 0 ? "#f2f2f2" : "white",
                   }}
                 >
-                  {Object.values(enfermero || {}).map((value, index) => (
+                  {Object.values(medico || {}).map((value, index) => (
                     <td
                       key={index}
                       style={{ padding: "10px", border: "1px solid #ddd" }}
@@ -252,7 +257,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
                   ))}
                   <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                     <button
-                      onClick={() => handleEdit(enfermero)}
+                      onClick={() => handleEdit(medico)}
                       style={{
                         backgroundColor: "#28a745",
                         color: "white",
@@ -265,7 +270,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
                       Editar
                     </button>
                     <button
-                      onClick={() => deleteEnfermerro(enfermero.id)}
+                      onClick={() => deleteMedic(medico.id)}
                       style={{
                         backgroundColor: "#dc3545",
                         color: "white",
@@ -347,7 +352,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         style={customStyles}
-        contentLabel={isCreating ? "Crear Enfermero" : "Editar Enfermero"}
+        contentLabel={isCreating ? "Crear Médico" : "Editar Médico"}
       >
         <h2
           style={{
@@ -357,7 +362,7 @@ const EnfermeroTable = ({ drawerOpen }) => {
             color: "#333",
           }}
         >
-          {isCreating ? "Crear Enfermero" : "Editar Enfermero"}
+          {isCreating ? "Crear Médico" : "Editar Médico"}
         </h2>
         <form
           onSubmit={handleSubmit}
@@ -421,4 +426,5 @@ const EnfermeroTable = ({ drawerOpen }) => {
   );
 };
 
-export default EnfermeroTable;
+export default MedicoTable;
+

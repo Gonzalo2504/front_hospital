@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/* import React, { useState } from 'react';
 import PersistentDrawerLeft from '../components/navs/medicoNav';
 import PacienteTable from '../components/tables/pacientesTable';
 import { useNavigate } from 'react-router-dom';
@@ -48,3 +48,4 @@ function App() {
 
 export default App;
 
+ */

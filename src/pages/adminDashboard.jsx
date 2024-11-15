@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PersistentDrawerLeft from '../components/navs/adminNav';
-import PacienteTable from '../components/tables/pacientesTable';
+import PacienteTable from '../components/tables/adminTables/pacientesTable';
 import { useNavigate } from 'react-router-dom';
-import MedicoTable from '../components/tables/medicosTable';
-import EnfermeroTable from '../components/tables/enfermerosTable';
+import MedicoTable from '../components/tables/adminTables/medicosTable';
+import EnfermeroTable from '../components/tables/adminTables/enfermerosTable';
 
 function App() {
   const [selectedComponent, setSelectedComponent] = useState(' ');
