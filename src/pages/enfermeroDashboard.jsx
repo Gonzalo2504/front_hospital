@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PersistentDrawerLeft from '../components/navs/enfermeroNav';
-import PacienteTable from '../components/tables/adminTables/pacientesTable';
+import PacienteAtendidoTable from '../components/tables/enfermeroTables/pacientesAtendidos';
+import PacienteEnEsperaTable from '../components/tables/enfermeroTables/pacientesEnEspera';
 import { useNavigate } from 'react-router-dom';
-import MedicoTable from '../components/tables/adminTables/medicosTable';
 
 function App() {
   const [selectedComponent, setSelectedComponent] = useState(' ');
@@ -20,9 +20,9 @@ function App() {
   const renderSelectedComponent = () => {
     switch (selectedComponent) {
       case 'En espera':
-        return <PacienteTable drawerOpen={drawerOpen} />;
+        return <PacienteEnEsperaTable drawerOpen={drawerOpen} />;
       case 'Atendidos':
-        return <MedicoTable drawerOpen={drawerOpen} />;
+        return <PacienteAtendidoTable drawerOpen={drawerOpen} />;
       case 'Cerrar Sesion':
         localStorage.removeItem('token');
         navigate('/');

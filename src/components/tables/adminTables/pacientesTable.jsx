@@ -5,7 +5,7 @@ import {
   deletePaciente,
   updatePaciente,
   createPaciente,
-} from "../../../api/endpoints/pacientes";
+} from "../../../api/endpoints/administrativo/pacientes";
 import ReactPaginate from "react-paginate";
 
 const customStyles = {

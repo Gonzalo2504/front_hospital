@@ -1,47 +1,47 @@
-import api from "../api";
+import api from "../../api";
 
-export const getMedicos = async () => {
+export const getEnfermeros = async () => {
   const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.get("/medicos", config);
+  const response = await api.get("/enfermeros", config);
   return response.data;
 };
 
-export const createMedico = async (formData) => {
+export const createEnfermero = async (formData) => {
   const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.post("/medicos", formData, config);
+  const response = await api.post("/enfermeros", formData, config);
   return response.data;
 };
 
-export const updateMedico = async (id, formData) => {
+export const updateEnfermero = async (id, formData) => {
   const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.put(`/medicos/${id}`, formData, config);
+  const response = await api.put(`/enfermeros/${id}`, formData, config);
   return response.data;
 };
 
-export const deleteMedico = async (id) => {
+export const deleteEnfermero = async (id) => {
   const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.delete(`/medicos/${id}`, config);
+  const response = await api.delete(`/enfermeros/${id}`, config);
   return response.data;
 };
 
-export default { getMedicos, createMedico, updateMedico, deleteMedico };
+export default { getEnfermeros, createEnfermero, updateEnfermero, deleteEnfermero };
