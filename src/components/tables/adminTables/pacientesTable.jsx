@@ -400,6 +400,7 @@ const PacienteTable = ({ drawerOpen }) => {
                 >
                   <option value="en espera">En espera</option>
                   <option value="atendido">Atendido</option>
+                  <option value="en tratamiento">En tratamiento</option>
                 </select>
               ) : (
                 <input
