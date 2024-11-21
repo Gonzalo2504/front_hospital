@@ -79,7 +79,7 @@ const PacienteTable = ({ drawerOpen }) => {
   const updatePatient = async (id) => {
     try {
       await updatePaciente(id, formData);
-      fetchPatients(); // Llama a fetchPatients para actualizar la tabla
+      fetchPatients(); 
       setEditingPatient(null);
       setFormData({
         nombre: "",
@@ -398,9 +398,9 @@ const PacienteTable = ({ drawerOpen }) => {
                     borderRadius: "4px",
                   }}
                 >
-                  <option value="en espera">En espera</option>
-                  <option value="atendido">Atendido</option>
-                  <option value="en tratamiento">En tratamiento</option>
+                  <option value="En espera">En espera</option>
+                  <option value="Atendido">Atendido</option>
+                  <option value="En tratamiento">En tratamiento</option>
                 </select>
               ) : (
                 <input
