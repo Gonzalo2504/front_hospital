@@ -28,26 +28,67 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
   };
 
   return (
-    <div className="w-full">
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div  style={{
+      width: drawerOpen ? "calc(87vw - 2px)" : "100vw",
+      margin: "0 0 0 auto",
+      padding: "20px",
+      backgroundColor: "#f9f9f9",
+      borderRadius: "8px",
+      boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    }}>
+      <table style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginBottom: "20px",
+        }}>
+        <thead>
           <tr>
-            <th scope="col" className="px-6 py-3">
-              Apellido
-            </th>
-            <th scope="col" className="px-6 py-3">
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
               Nombre
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
+              Apellido
+            </th>
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
               DNI
             </th>
-            <th scope="col" className="px-6 py-3">
-              Tel fono
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
+              Teléfono
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
               Email
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th style={{
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    padding: "10px",
+                    textAlign: "left",
+                  }}>
               Fecha de nacimiento
             </th>
           </tr>
@@ -56,40 +97,87 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
           {patients.slice(currentPage * 10, (currentPage + 1) * 10).map((patient) => (
             <tr
               key={patient.id}
-              className="bg-white border-b dark:bg-gray-900 dark:border-gray-700"
+              style={{
+                backgroundColor: patient.id % 2 === 0 ? "#f2f2f2" : "white",
+              }}
             >
-              <td className="px-6 py-4">
-                {patient.apellido}
-              </td>
-              <td className="px-6 py-4">
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                 {patient.nombre}
               </td>
-              <td className="px-6 py-4">
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                {patient.apellido}
+              </td>
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                 {patient.dni}
               </td>
-              <td className="px-6 py-4">
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                 {patient.telefono}
               </td>
-              <td className="px-6 py-4">
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                 {patient.email}
               </td>
-              <td className="px-6 py-4">
+              <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                 {patient.fecha_nacimiento}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel=" >"
-        onPageChange={handlePageClick}
-        pageRangeDisplayed={5}
-        pageCount={pageCount}
-        previousLabel="< "
-        renderOnZeroPageCount={null}
-        className="flex items-center justify-center mt-4"
-      />
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      >
+        <ReactPaginate
+          previousLabel={"<"}
+          nextLabel={">"}
+          breakLabel={"..."}
+          breakClassName={"break-me"}
+          pageCount={pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+          pageClassName={"page-item"}
+          pageLinkClassName={"page-link"}
+          previousClassName={"page-item"}
+          previousLinkClassName={"page-link"}
+          nextClassName={"page-item"}
+          nextLinkClassName={"page-link"}
+          breakLinkClassName={"page-link"}
+          renderOnZeroPageCount={null}
+        />
+      </div>
+      <style>
+        {`
+          .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            align-items: center;
+          }
+          .page-item {
+            margin: 0 5px;
+          }
+          .page-link {
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+          }
+          .page-link:hover {
+            background-color: #007bff;
+            color: white;
+          }
+          .active .page-link {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+          }
+        `}
+      </style>
     </div>
   );
 
