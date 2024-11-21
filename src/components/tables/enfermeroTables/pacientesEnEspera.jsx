@@ -21,6 +21,31 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
     }
   };
 
+  const realizarTriage = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const triageData = {
+      id_paciente: formData.get("paciente_id"),
+      clasificacion: formData.get("clasificacion"),
+      antecedentes: formData.get("antecedentes"),
+      frecuencia_cardiaca: formData.get("frecuencia_cardiaca"),
+      presion_arterial_sistolica: formData.get("presion_arterial_sistolica"),
+      presion_arterial_diastolica: formData.get("presion_arterial_diastolica"),
+      temperatura: formData.get("temperatura"),
+      frecuencia_respiratoria: formData.get("frecuencia_respiratoria"),
+      saturacion_oxigeno: formData.get("saturacion_oxigeno"),
+      motivo_consulta: formData.get("motivo_consulta"),
+      observaciones: formData.get("observaciones"),
+    };
+    try {
+      const response = await createTriage(triageData);
+      console.log(response);
+      fetchPatients();
+    } catch (error) {
+      console.error("Error creating triage:", error);
+    }
+  };
+
   const handlePageClick = ({ selected: selectedPage }) => {
     setCurrentPage(selectedPage);
   };
@@ -147,7 +172,7 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
-                    onClick={() => handleEdit(patient)}
+                    onClick={() => realizarTriage(patient)}
                     style={{
                       backgroundColor: "#4c2882",
                       color: "white",
