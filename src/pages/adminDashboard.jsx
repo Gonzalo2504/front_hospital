@@ -30,11 +30,7 @@ function App() {
         localStorage.removeItem('token');
         navigate('/');
       default:
-        return (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            Puede seleccionar opciones de la barra lateral
-          </div>
-        );
+        return (<PacienteTable drawerOpen={drawerOpen} />);
     }
   };
 

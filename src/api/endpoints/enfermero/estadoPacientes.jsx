@@ -18,6 +18,6 @@ export const getPacientesAtendidos = async () => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.get("/pacientes/atendidos/lista", config);
+  const response = await api.get("/pacientes/en_tratamiento/lista", config);
   return response.data;
 };

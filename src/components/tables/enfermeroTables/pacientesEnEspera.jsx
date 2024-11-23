@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { getPacientesEnEspera } from "../../../api/endpoints/enfermero/estadoPacientes";
+import { createTriage } from "../../../api/endpoints/enfermero/relizarTriages";
 import ReactPaginate from "react-paginate";
+import Modal from "react-modal";
 
 const PacienteEnEsperaTable = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [idEnfermero, setIdEnfermero] = useState(null);
 
   useEffect(() => {
     fetchPatients();
@@ -21,28 +26,50 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const parts = token.split(".");
+      const payload = parts[1];
+      const decodedPayload = atob(payload);
+      const decodedToken = JSON.parse(decodedPayload);
+      setIdEnfermero(decodedToken.id_usuario); 
+    }
+  }, []);
+
+  useEffect(() => {
+    if (idEnfermero) {
+      console.log(`Hola soy el enfermero con el id: ${idEnfermero}`);
+    
+    }
+  }, [idEnfermero]);
+
   const realizarTriage = async (event) => {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(event.target);
+
     const triageData = {
-      id_paciente: formData.get("paciente_id"),
-      clasificacion: formData.get("clasificacion"),
-      antecedentes: formData.get("antecedentes"),
-      frecuencia_cardiaca: formData.get("frecuencia_cardiaca"),
-      presion_arterial_sistolica: formData.get("presion_arterial_sistolica"),
-      presion_arterial_diastolica: formData.get("presion_arterial_diastolica"),
-      temperatura: formData.get("temperatura"),
-      frecuencia_respiratoria: formData.get("frecuencia_respiratoria"),
-      saturacion_oxigeno: formData.get("saturacion_oxigeno"),
-      motivo_consulta: formData.get("motivo_consulta"),
-      observaciones: formData.get("observaciones"),
+      id_paciente: formData.get("paciente_id") || null,
+      id_enfermero: idEnfermero, 
+      fecha_y_hora: formData.get("fecha_y_hora") || null,
+      clasificacion: formData.get("clasificacion") || null,
+      antecedentes: formData.get("antecedentes") || null,
+      frecuencia_cardiaca: formData.get("frecuencia_cardiaca") || null,
+      presion_arterial_sistolica: formData.get("presion_arterial_sistolica") || null,
+      presion_arterial_diastolica: formData.get("presion_arterial_diastolica") || null,
+      temperatura: formData.get("temperatura") || null,
+      frecuencia_respiratoria: formData.get("frecuencia_respiratoria") || null,
+      saturacion_oxigeno: formData.get("saturacion_oxigeno") || null,
+      motivo_consulta: formData.get("motivo_consulta") || null,
+      observaciones: formData.get("observaciones") || null,
     };
+
     try {
       const response = await createTriage(triageData);
       console.log(response);
       fetchPatients();
     } catch (error) {
-      console.error("Error creating triage:", error);
+      console.error("Error creando triage:", error);
     }
   };
 
@@ -70,6 +97,16 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
+          <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+                textAlign: "left",
+              }}
+            >
+              ID
+            </th>
             <th
               style={{
                 backgroundColor: "#007bff",
@@ -108,27 +145,7 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
                 textAlign: "left",
               }}
             >
-              Teléfono
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Email
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Fecha de nacimiento
+              Hora de Ingreso
             </th>
             <th
               style={{
@@ -153,6 +170,9 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
                 }}
               >
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.id}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   {patient.nombre}
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
@@ -162,17 +182,14 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
                   {patient.dni}
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.telefono}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.email}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.fecha_nacimiento}
+                  {patient.fecha_estado_cambio}
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
-                    onClick={() => realizarTriage(patient)}
+                    onClick={() => {
+                      setSelectedPatient(patient);
+                      setModalIsOpen(true);
+                    }}
                     style={{
                       backgroundColor: "#4c2882",
                       color: "white",
@@ -189,6 +206,223 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
             ))}
         </tbody>
       </table>
+      <Modal
+  isOpen={modalIsOpen}
+  onRequestClose={() => setModalIsOpen(false)}
+  style={{
+    overlay: {
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    content: {
+      width: "700px",
+      height: "800px",
+      margin: "auto",
+      padding: "20px",
+      borderRadius: "10px",
+      boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    },
+  }}
+>
+  <h2
+    style={{
+      textAlign: "center",
+      marginBottom: "20px",
+      fontSize: "24px",
+      color: "#333",
+    }}
+  >
+    Crear Triage
+  </h2>
+  <form
+    onSubmit={realizarTriage}
+    style={{ maxHeight: "100%", overflow: "auto" }}
+  >
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      {/* ID del Paciente */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <label>
+          ID Paciente:
+          <input
+            type="text"
+            name="paciente_id"
+            value={selectedPatient ? selectedPatient.id : ""}
+            readOnly
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "12px",
+              marginTop: "10px",
+              fontSize: "16px",
+              boxSizing: "border-box",
+              backgroundColor: "#f5f5f5",
+            }}
+          />
+        </label>
+      </div>
+
+      {/* ID del Enfermero */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <label>
+          ID Enfermero:
+          <input
+            type="text"
+            name="id_enfermero"
+            value={idEnfermero}
+            readOnly
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "12px",
+              marginTop: "10px",
+              fontSize: "16px",
+              boxSizing: "border-box",
+              backgroundColor: "#f5f5f5",
+            }}
+          />
+        </label>
+      </div>
+
+      {/* Fecha y Hora */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <label>
+          Fecha y Hora:
+          <input
+            type="datetime-local"
+            name="fecha_y_hora"
+            value={new Date().toISOString().slice(0,16)}
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "12px",
+              marginTop: "10px",
+              fontSize: "16px",
+              boxSizing: "border-box",
+            }}
+            required
+          />
+        </label>
+      </div>
+
+      {/* Clasificación */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <select
+          name="clasificacion"
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "12px",
+            marginTop: "10px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+          required
+        >
+          <option value="">Clasificación</option>
+          <option value="Verde">Verde</option>
+          <option value="Amarillo">Amarillo</option>
+          <option value="Rojo">Rojo</option>
+        </select>
+      </div>
+
+      {/* Antecedentes */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <textarea
+          name="antecedentes"
+          placeholder="Antecedentes"
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "12px",
+            marginTop: "10px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      {/* Campos Opcionales */}
+      {[
+        { name: "frecuencia_cardiaca", label: "Frecuencia Cardíaca" },
+        { name: "presion_arterial_sistolica", label: "Presión Arterial Sistólica" },
+        { name: "presion_arterial_diastolica", label: "Presión Arterial Diastólica" },
+        { name: "temperatura", label: "Temperatura", step: "0.1" },
+        { name: "frecuencia_respiratoria", label: "Frecuencia Respiratoria" },
+        { name: "saturacion_oxigeno", label: "Saturación de Oxígeno" },
+      ].map((field) => (
+        <div style={{ flex: "1 1 calc(50% - 10px)" }} key={field.name}>
+          <label>
+            {field.label}:
+            <input
+              type="number"
+              name={field.name}
+              placeholder={field.label}
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "12px",
+                marginTop: "10px",
+                fontSize: "16px",
+                boxSizing: "border-box",
+              }}
+              {...(field.step ? { step: field.step } : {})}
+              min="0"
+            />
+          </label>
+        </div>
+      ))}
+
+      {/* Motivo de Consulta */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <textarea
+          name="motivo_consulta"
+          placeholder="Motivo de Consulta"
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "12px",
+            marginTop: "10px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      {/* Observaciones */}
+      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+        <textarea
+          name="observaciones"
+          placeholder="Observaciones"
+          style={{
+            display: "block",
+            width: "100%",
+            padding: "12px",
+            marginTop: "10px",
+            fontSize: "16px",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      style={{
+        display: "block",
+        width: "100%",
+        padding: "15px",
+        backgroundColor: "#007BFF",
+        color: "#fff",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        marginTop: "20px",
+        fontSize: "16px",
+      }}
+    >
+      Crear Triage
+    </button>
+  </form>
+</Modal>
       <div
         style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
       >
@@ -213,36 +447,37 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
           renderOnZeroPageCount={null}
         />
       </div>
+
       <style>
         {`
-          .pagination {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            align-items: center;
-          }
-          .page-item {
-            margin: 0 5px;
-          }
-          .page-link {
-            padding: 10px 15px;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
-          }
-          .page-link:hover {
-            background-color: #007bff;
-            color: white;
-          }
-          .active .page-link {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-          }
-        `}
+  .pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+  }
+  .page-item {
+    margin: 0 5px;
+  }
+  .page-link {
+    padding: 10px 15px;
+    border: 1px solid #007bff;
+    border-radius: 4px;
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .page-link:hover {
+    background-color: #007bff;
+    color: white;
+  }
+  .active .page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+`}
       </style>
     </div>
   );
