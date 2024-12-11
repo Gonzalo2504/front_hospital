@@ -1,13 +1,13 @@
 import api from "../../api";
 
-export const getPacientesEnAtencion = async () => {
+export const getPacientesEnAtencionPorClasificacion = async (clasificacion) => {
   const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.get("/pacientes/en-atencion", config);
+  const response = await api.get(`/pacientes/en-atencion/clasificacion/${clasificacion}`, config);
   return response.data;
 };
 
