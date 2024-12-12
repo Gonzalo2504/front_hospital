@@ -19,5 +19,6 @@ export const getUltimoTriage = async (pacienteId) => {
     },
   };
   const response = await api.get(`/pacientes/${pacienteId}/ultimo-triage`, config);
+  console.log(response.data);
   return response.data;
 };

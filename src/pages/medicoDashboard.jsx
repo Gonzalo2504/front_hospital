@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import PersistentDrawerLeft from '../components/navs/medicoNav';
-import PacienteAtendidoTable from '../components/tables/enfermeroTables/pacientesAtendidos';
-import PacienteEnEsperaTable from '../components/tables/enfermeroTables/pacientesEnEspera';
+import PacienteTriageVerde from '../components/tables/medicoTables/pacientesEnAtencionVerde';
+import PacienteTriageAmarillo from '../components/tables/medicoTables/pacientesEnAtencionAmarillo';
+import PacienteTriageRojo from '../components/tables/medicoTables/pacientesEnAtencionRojo';
 import { useNavigate } from 'react-router-dom';
 
 function App() {
@@ -20,16 +21,16 @@ function App() {
   const renderSelectedComponent = () => {
     switch (selectedComponent) {
       case 'Codigo Rojo':
-        return <PacienteEnEsperaTable drawerOpen={drawerOpen} />;
+        return <PacienteTriageRojo drawerOpen={drawerOpen} />;
       case 'Codigo Amarillo':
-        return <PacienteAtendidoTable drawerOpen={drawerOpen} />;
+        return <PacienteTriageAmarillo drawerOpen={drawerOpen} />;
       case 'Codigo Verde':
-        return <PacienteAtendidoTable drawerOpen={drawerOpen} />;
+        return <PacienteTriageVerde drawerOpen={drawerOpen} />;
       case 'Cerrar Sesion':
         localStorage.removeItem('token');
         navigate('/');
       default:
-        return (<PacienteEnEsperaTable drawerOpen={drawerOpen} />);
+        return (<PacienteTriageRojo drawerOpen={drawerOpen} />);
     }
   };
 

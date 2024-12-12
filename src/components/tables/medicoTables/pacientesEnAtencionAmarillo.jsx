@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getPacientesAtendidos } from "../../../api/endpoints/enfermero/estadoPacientes";
+import { getPacientesEnAtencionPorClasificacion } from "../../../api/endpoints/medico/estadoPacientesMed";
 import ReactPaginate from "react-paginate";
 
-const PacienteAtendidoTable = ({ drawerOpen }) => {
+const PacienteTriageAmarillo = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -13,7 +13,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
 
   const fetchPatients = async () => {
     try {
-      const response = await getPacientesAtendidos();
+      const response = await getPacientesEnAtencionPorClasificacion("Amarillo");
       setPatients(response);
       setPageCount(Math.ceil(response.length / 10));
     } catch (error) {
@@ -145,7 +145,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   {patient.fecha_nacimiento}
                 </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+               {/*  <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
                     onClick={() => handleEdit(patient)}
                     style={{
@@ -159,7 +159,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                   >
                     Ver Orden Medica
                   </button>
-                </td>
+                </td> */}
               </tr>
             ))}
         </tbody>
@@ -223,4 +223,4 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
   );
 };
 
-export default PacienteAtendidoTable;
+export default PacienteTriageAmarillo;

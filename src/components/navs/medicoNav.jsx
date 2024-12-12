@@ -20,50 +20,27 @@ import ListItemText from '@mui/material/ListItemText';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme }) => ({
+  ({ theme, open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: `-${drawerWidth}px`,
-    variants: [
-      {
-        props: ({ open }) => open,
-        style: {
-          transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-          marginLeft: 0,
-        },
-      },
-    ],
+    marginLeft: open ? 0 : `-${drawerWidth}px`,
   }),
 );
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme }) => ({
+})(({ theme, open }) => ({
   transition: theme.transitions.create(['margin', 'width'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
+  width: open ? `calc(100% - ${drawerWidth}px)` : '100%',
+  marginLeft: open ? `${drawerWidth}px` : 0,
   backgroundColor: '#405D72',
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        width: `calc(100% - ${drawerWidth}px)`,
-        marginLeft: `${drawerWidth}px`,
-        transition: theme.transitions.create(['margin', 'width'], {
-          easing: theme.transitions.easing.easeOut,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
-      },
-    },
-  ],
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -74,17 +51,10 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function PersistentDrawerLeft() {
+export default function PersistentDrawerLeft({ onMenuSelect, open, toggleSidebar }) {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const menuItems = ['Codigo Rojo', 'Codigo Amarillo', 'Codigo Verde', 'Cerrar Sesion'];
 
   return (
     <Box sx={{ display: 'flex', color: 'darkgray' }}>
@@ -92,9 +62,9 @@ export default function PersistentDrawerLeft() {
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
-            color='inherit'
+            color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={toggleSidebar}
             edge="start"
             sx={[
               {
@@ -106,7 +76,7 @@ export default function PersistentDrawerLeft() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Panel del Medico
+            Panel de Medicos
           </Typography>
         </Toolbar>
       </AppBar>
@@ -126,21 +96,18 @@ export default function PersistentDrawerLeft() {
         open={open}
       >
         <DrawerHeader>
-          <IconButton
-            onClick={handleDrawerClose}
-            sx={{ color: 'white' }}
-          >
+          <IconButton onClick={toggleSidebar} sx={{ color: 'white' }}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
         <Divider sx={{ borderColor: 'white' }} />
         <List>
-          {['Codigo Rojo', 'Codigo Amarillo', 'Codigo Verde', 'Cerrar Sesion'].map((text, index) => (
+          {menuItems.map((text, index) => (
             <ListItem
               key={text}
               disablePadding
               onClick={() => {
-                console.log(`Se ha presionado ${text}`);
+                onMenuSelect(text);
               }}
             >
               <ListItemButton>
@@ -148,9 +115,9 @@ export default function PersistentDrawerLeft() {
                   {index === 0 ? (
                     <img src="../assets/icono_paciente.png" width={30} height={30} />
                   ) : index === 1 ? (
-                    <img src="../assets/doctor.png" width={30} height={30} />
+                    <img src="../assets/icono_paciente.png" width={30} height={30} />
                   ) : index === 2 ? (
-                    <img src="../assets/needle.png" width={30} height={30} />
+                    <img src="../assets/icono_paciente.png" width={30} height={30} />
                   ) : (
                     <img src="../assets/logout-variant.png" width={30} height={30} />
                   )}
