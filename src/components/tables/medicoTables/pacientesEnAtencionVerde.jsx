@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { getPacientesEnAtencionPorClasificacion, getUltimoTriage } from "../../../api/endpoints/medico/estadoPacientesMed";
+import {
+  getPacientesEnAtencionPorClasificacion,
+  getUltimoTriage,
+} from "../../../api/endpoints/medico/estadoPacientesMed";
 import ReactPaginate from "react-paginate";
+import Modal from "react-modal";
+
+Modal.setAppElement("#root");
 
 const PacienteTriageVerde = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [ultimoTriage, setUltimoTriage] = useState(null);
 
   useEffect(() => {
     fetchPatients();
@@ -147,7 +155,12 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
-                    onClick={() => getUltimoTriage(patient.id)}
+                    onClick={() => {
+                      getUltimoTriage(patient.id).then((ultimoTriage) => {
+                        setUltimoTriage(ultimoTriage);
+                        setIsOpen(true);
+                      });
+                    }}
                     style={{
                       backgroundColor: "#28a745",
                       color: "white",
@@ -159,6 +172,114 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
                   >
                     Ver Ultimo Triage
                   </button>
+                  {isOpen && (
+                   <Modal
+                   isOpen={isOpen}
+                   onRequestClose={() => setIsOpen(false)}
+                   style={{
+                     overlay: {
+                       backgroundColor: "rgba(0, 0, 0, 0.5)",
+                     },
+                     content: {
+                       width: "700px",
+                       maxHeight: "90vh",
+                       margin: "auto",
+                       padding: "20px",
+                       borderRadius: "10px",
+                       boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                       overflow: "auto",
+                     },
+                   }}
+                 >
+                   <h2
+                     style={{
+                       textAlign: "center",
+                       marginBottom: "20px",
+                       fontSize: "24px",
+                       fontWeight: "bold",
+                       color: "#333",
+                     }}
+                   >
+                     Último Triage
+                   </h2>
+                 
+                   <div
+                     style={{
+                       display: "flex",
+                       flexWrap: "wrap",
+                       gap: "20px",
+                     }}
+                   >
+                     {ultimoTriage &&
+                       Object.entries(ultimoTriage).map(([key, value]) => {
+                         // Ocultar IDs del triage, paciente y enfermero
+                         if (
+                           key === "id_triage" ||
+                           key === "id_paciente" ||
+                           key === "id_enfermero"
+                         )
+                           return null;
+                 
+                         // Convertir claves en etiquetas legibles
+                         const label = key
+                           .replace(/_/g, " ")
+                           .replace(/\b\w/g, (char) => char.toUpperCase());
+                 
+                         return (
+                           <div
+                             key={key}
+                             style={{
+                               flex: "1 1 calc(50% - 10px)",
+                               marginBottom: "10px",
+                             }}
+                           >
+                             <label
+                               style={{
+                                 display: "block",
+                                 fontSize: "14px",
+                                 fontWeight: "bold",
+                                 color: "#555",
+                                 marginBottom: "5px",
+                               }}
+                             >
+                               {label}:
+                             </label>
+                             <div
+                               style={{
+                                 fontSize: "16px",
+                                 color: "#333",
+                                 backgroundColor: "#f5f5f5",
+                                 padding: "12px",
+                                 borderRadius: "5px",
+                                 border: "1px solid #ddd",
+                               }}
+                             >
+                               {value}
+                             </div>
+                           </div>
+                         );
+                       })}
+                   </div>
+                 
+                   <div style={{ textAlign: "center", marginTop: "20px" }}>
+                     <button
+                       onClick={() => setIsOpen(false)}
+                       style={{
+                         backgroundColor: "#007bff",
+                         color: "#fff",
+                         border: "none",
+                         borderRadius: "5px",
+                         padding: "12px 20px",
+                         fontSize: "16px",
+                         cursor: "pointer",
+                       }}
+                     >
+                       Cerrar
+                     </button>
+                   </div>
+                 </Modal>
+                 
+                  )}
                 </td>
               </tr>
             ))}

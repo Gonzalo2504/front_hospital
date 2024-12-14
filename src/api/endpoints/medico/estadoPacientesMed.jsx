@@ -22,3 +22,14 @@ export const getUltimoTriage = async (pacienteId) => {
   console.log(response.data);
   return response.data;
 };
+
+export const createOrdenMedica = async (ordenData) => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.post("/ordenes_medicas/", ordenData, config);
+  return response.data;
+};

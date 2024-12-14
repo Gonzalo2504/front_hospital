@@ -33,14 +33,13 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
       const payload = parts[1];
       const decodedPayload = atob(payload);
       const decodedToken = JSON.parse(decodedPayload);
-      setIdEnfermero(decodedToken.id_usuario); 
+      setIdEnfermero(decodedToken.id_usuario);
     }
   }, []);
 
   useEffect(() => {
     if (idEnfermero) {
       console.log(`Hola soy el enfermero con el id: ${idEnfermero}`);
-    
     }
   }, [idEnfermero]);
 
@@ -50,13 +49,15 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
 
     const triageData = {
       id_paciente: formData.get("paciente_id") || null,
-      id_enfermero: idEnfermero, 
+      id_enfermero: idEnfermero,
       fecha_y_hora: formData.get("fecha_y_hora") || null,
       clasificacion: formData.get("clasificacion") || null,
       antecedentes: formData.get("antecedentes") || null,
       frecuencia_cardiaca: formData.get("frecuencia_cardiaca") || null,
-      presion_arterial_sistolica: formData.get("presion_arterial_sistolica") || null,
-      presion_arterial_diastolica: formData.get("presion_arterial_diastolica") || null,
+      presion_arterial_sistolica:
+        formData.get("presion_arterial_sistolica") || null,
+      presion_arterial_diastolica:
+        formData.get("presion_arterial_diastolica") || null,
       temperatura: formData.get("temperatura") || null,
       frecuencia_respiratoria: formData.get("frecuencia_respiratoria") || null,
       saturacion_oxigeno: formData.get("saturacion_oxigeno") || null,
@@ -97,7 +98,7 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
-          <th
+            <th
               style={{
                 backgroundColor: "#007bff",
                 color: "white",
@@ -207,222 +208,206 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
         </tbody>
       </table>
       <Modal
-  isOpen={modalIsOpen}
-  onRequestClose={() => setModalIsOpen(false)}
-  style={{
-    overlay: {
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
-    },
-    content: {
-      width: "700px",
-      height: "800px",
-      margin: "auto",
-      padding: "20px",
-      borderRadius: "10px",
-      boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-    },
-  }}
->
-  <h2
-    style={{
-      textAlign: "center",
-      marginBottom: "20px",
-      fontSize: "24px",
-      color: "#333",
-    }}
-  >
-    Crear Triage
-  </h2>
-  <form
-    onSubmit={realizarTriage}
-    style={{ maxHeight: "100%", overflow: "auto" }}
-  >
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-      {/* ID del Paciente */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <label>
-          ID Paciente:
-          <input
-            type="text"
-            name="paciente_id"
-            value={selectedPatient ? selectedPatient.id : ""}
-            readOnly
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "12px",
-              marginTop: "10px",
-              fontSize: "16px",
-              boxSizing: "border-box",
-              backgroundColor: "#f5f5f5",
-            }}
-          />
-        </label>
-      </div>
+        isOpen={modalIsOpen}
+        onRequestClose={() => setModalIsOpen(false)}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          },
+          content: {
+            width: "700px",
+            height: "800px",
+            margin: "auto",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      >
 
-      {/* ID del Enfermero */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <label>
-          ID Enfermero:
-          <input
-            type="text"
-            name="id_enfermero"
-            value={idEnfermero}
-            readOnly
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "12px",
-              marginTop: "10px",
-              fontSize: "16px",
-              boxSizing: "border-box",
-              backgroundColor: "#f5f5f5",
-            }}
-          />
-        </label>
-      </div>
-
-      {/* Fecha y Hora */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <label>
-          Fecha y Hora:
-          <input
-            type="datetime-local"
-            name="fecha_y_hora"
-            value={new Date().toISOString().slice(0,16)}
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "12px",
-              marginTop: "10px",
-              fontSize: "16px",
-              boxSizing: "border-box",
-            }}
-            required
-          />
-        </label>
-      </div>
-
-      {/* Clasificación */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <select
-          name="clasificacion"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "12px",
-            marginTop: "10px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-          required
+        <form
+          onSubmit={realizarTriage}
+          style={{ maxHeight: "100%", overflow: "auto" }}
         >
-          <option value="">Clasificación</option>
-          <option value="Verde">Verde</option>
-          <option value="Amarillo">Amarillo</option>
-          <option value="Rojo">Rojo</option>
-        </select>
-      </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+            {/* Fecha y Hora */}
+            <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+              <label>
+                Fecha y Hora:
+                <input
+                  type="datetime-local"
+                  name="fecha_y_hora"
+                  value={new Date().toISOString().slice(0, 16)}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "12px",
+                    marginTop: "10px",
+                    fontSize: "16px",
+                    boxSizing: "border-box",
+                  }}
+                  required
+                />
+              </label>
+            </div>
 
-      {/* Antecedentes */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <textarea
-          name="antecedentes"
-          placeholder="Antecedentes"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "12px",
-            marginTop: "10px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-        />
-      </div>
+            {/* Clasificación */}
+            <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+              <label style={{ display: "block", marginBottom: "10px" }}>
+                Clasificación:
+              </label>
+              <select
+                name="clasificacion"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "12px",
+                  marginTop: "10px",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
+                }}
+                required
+              >
+                <option value="Verde">Verde</option>
+                <option value="Amarillo">Amarillo</option>
+                <option value="Rojo">Rojo</option>
+              </select>
+            </div>
 
-      {/* Campos Opcionales */}
-      {[
-        { name: "frecuencia_cardiaca", label: "Frecuencia Cardíaca" },
-        { name: "presion_arterial_sistolica", label: "Presión Arterial Sistólica" },
-        { name: "presion_arterial_diastolica", label: "Presión Arterial Diastólica" },
-        { name: "temperatura", label: "Temperatura", step: "0.1" },
-        { name: "frecuencia_respiratoria", label: "Frecuencia Respiratoria" },
-        { name: "saturacion_oxigeno", label: "Saturación de Oxígeno" },
-      ].map((field) => (
-        <div style={{ flex: "1 1 calc(50% - 10px)" }} key={field.name}>
-          <label>
-            {field.label}:
-            <input
-              type="number"
-              name={field.name}
-              placeholder={field.label}
-              style={{
-                display: "block",
-                width: "100%",
-                padding: "12px",
-                marginTop: "10px",
-                fontSize: "16px",
-                boxSizing: "border-box",
-              }}
-              {...(field.step ? { step: field.step } : {})}
-              min="0"
-            />
-          </label>
-        </div>
-      ))}
+            {/* Antecedentes */}
+            <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+              <label style={{ display: "block", marginBottom: "10px" }}>
+                Antecedentes:
+              </label>
+              <textarea
+                name="antecedentes"
+                placeholder="Ej: Diabetes tipo 2, Hipertensión"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "12px",
+                  marginTop: "10px",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
 
-      {/* Motivo de Consulta */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <textarea
-          name="motivo_consulta"
-          placeholder="Motivo de Consulta"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "12px",
-            marginTop: "10px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-        />
-      </div>
+            {/* Motivo de Consulta */}
+            <div style={{ flex: "1 1 calc(50% - 10px)" }}>
+              <label style={{ display: "block", marginBottom: "10px" }}>
+                Motivo de Consulta:
+              </label>
+              <textarea
+                name="motivo_consulta"
+                placeholder="Ej: Fiebre alta y dificultad para respirar"
+                style={{
+                  display: "block",
+                  width: "100%",
+                  padding: "12px",
+                  marginTop: "10px",
+                  fontSize: "16px",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
 
-      {/* Observaciones */}
-      <div style={{ flex: "1 1 calc(50% - 10px)" }}>
-        <textarea
-          name="observaciones"
-          placeholder="Observaciones"
-          style={{
-            display: "block",
-            width: "100%",
-            padding: "12px",
-            marginTop: "10px",
-            fontSize: "16px",
-            boxSizing: "border-box",
-          }}
-        />
-      </div>
-    </div>
+            {/* Campos Numéricos */}
+            {[
+              {
+                name: "frecuencia_cardiaca",
+                label: "Frecuencia Cardíaca",
+                placeholder: "Ej: 75",
+              },
+              {
+                name: "presion_arterial_sistolica",
+                label: "Presión Arterial Sistólica",
+                placeholder: "Ej: 120",
+              },
+              {
+                name: "presion_arterial_diastolica",
+                label: "Presión Arterial Diastólica",
+                placeholder: "Ej: 80",
+              },
+              {
+                name: "temperatura",
+                label: "Temperatura",
+                placeholder: "Ej: 38.5",
+                step: "0.1",
+              },
+              {
+                name: "frecuencia_respiratoria",
+                label: "Frecuencia Respiratoria",
+                placeholder: "Ej: 18",
+              },
+              {
+                name: "saturacion_oxigeno",
+                label: "Saturación de Oxígeno",
+                placeholder: "Ej: 97",
+              },
+            ].map((field) => (
+              <div style={{ flex: "1 1 calc(50% - 10px)" }} key={field.name}>
+                <label>
+                  {field.label}:
+                  <input
+                    type="number"
+                    name={field.name}
+                    placeholder={field.placeholder}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      padding: "12px",
+                      marginTop: "10px",
+                      fontSize: "16px",
+                      boxSizing: "border-box",
+                    }}
+                    {...(field.step ? { step: field.step } : {})}
+                    min="0"
+                  />
+                </label>
+              </div>
+            ))}
 
-    <button
-      type="submit"
-      style={{
-        display: "block",
-        width: "100%",
-        padding: "15px",
-        backgroundColor: "#007BFF",
-        color: "#fff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-        marginTop: "20px",
-        fontSize: "16px",
-      }}
-    >
-      Crear Triage
-    </button>
-  </form>
-</Modal>
+            {/* Observaciones */}
+            <div style={{ flex: "1 1 100%" }}>
+              <label>
+                Observaciones:
+                <textarea
+                  name="observaciones"
+                  placeholder="Ej: Paciente refiere dolor intenso en el pecho"
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    padding: "12px",
+                    marginTop: "10px",
+                    fontSize: "16px",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </label>
+            </div>
+
+          <button
+            type="submit"
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "15px",
+              backgroundColor: "#007BFF",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "20px",
+              fontSize: "16px",
+            }}
+          >
+            Crear Triage
+          </button>
+          </div>
+        </form>
+      </Modal>
+
       <div
         style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
       >
