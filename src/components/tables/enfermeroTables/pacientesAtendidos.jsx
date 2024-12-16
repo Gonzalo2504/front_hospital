@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { getPacientesConOrdenMedicaCreada } from "../../../api/endpoints/enfermero/estadoPacientes";
-import { getUltimaOrdenMedicaPorPaciente } from "../../../api/endpoints/enfermero/ordenesMedicasEnf";
+import { getUltimaOrdenMedicaPorPaciente, createEvolucionPaciente } from "../../../api/endpoints/enfermero/ordenesMedicasEnf";
 import ReactPaginate from "react-paginate";
 
 const PacienteAtendidoTable = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showModalEvol, setShowModalEvol] = useState(false);
+  const [evolutionData, setEvolutionData] = useState({
+    id_orden_medica: "",
+    id_paciente: "",
+    id_enfermero: "",
+    descripcion: "",
+    fecha_y_hora: "",
+  });
 
   useEffect(() => {
     fetchPatients();
@@ -41,6 +50,47 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
 
   const handlePageClick = ({ selected: selectedPage }) => {
     setCurrentPage(selectedPage);
+  };
+
+  const handleOpenModalEvol = (patient) => {
+    setSelectedPatient(patient);
+    setEvolutionData((prev) => ({
+      ...prev,
+      id_paciente: patient.id,
+    }));
+    setShowModal(true);
+  };
+
+  const handleCloseModalEvol = () => {
+    setShowModalEvol(false);
+    setSelectedPatient(null);
+    setEvolutionData({
+      id_orden_medica: "",
+      id_paciente: "",
+      id_enfermero: "",
+      descripcion: "",
+      fecha_y_hora: "",
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEvolutionData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createEvolucionPaciente(evolutionData);
+      alert("Evolución creada exitosamente");
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error creating evolution:", error);
+      alert("Error al crear la evolución");
+    }
   };
 
   return (
@@ -106,7 +156,10 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                       Ver Orden Medica
                     </button>
                     <button
-                      onClick={() => handleViewOrder(patient.id)}
+                      onClick={() => {
+                        handleOpenModalEvol(patient);
+                        setShowModalEvol(true);
+                      }}
                       style={{
                         backgroundColor: "blue",
                         color: "white",
@@ -229,6 +282,33 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
           }}
           onClick={handleCloseModal}
         />
+      )}
+      {showModalEvol && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            padding: "20px",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+            borderRadius: "8px",
+            zIndex: 1000,
+          }}
+        >
+          <h3>Crear Evolución</h3>
+          <form onSubmit={handleSubmit}>
+            <label>Descripción</label>
+            <textarea
+              name="descripcion"
+              value={evolutionData.descripcion}
+              onChange={handleInputChange}
+            />
+            <button type="submit">Guardar</button>
+            <button onClick={handleCloseModalEvol}>Cerrar</button>
+          </form>
+        </div>
       )}
     </div>
   );

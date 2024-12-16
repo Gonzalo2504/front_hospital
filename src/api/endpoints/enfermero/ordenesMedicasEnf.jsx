@@ -10,3 +10,14 @@ export const getUltimaOrdenMedicaPorPaciente = async (idPaciente) => {
   console.log(response.data);
   return response.data;
 };
+
+export const createEvolucionPaciente = async (evolucionPaciente) => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.post("/ordenes_medicas/evolucion_paciente/", evolucionPaciente, config);
+  return response.data;
+};
