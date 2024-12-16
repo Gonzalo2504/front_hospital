@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   getPacientesEnAtencionPorClasificacion,
   getUltimoTriage,
+  createOrdenMedica,
 } from "../../../api/endpoints/medico/estadoPacientesMed";
 import ReactPaginate from "react-paginate";
 import Modal from "react-modal";
@@ -12,8 +13,17 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenTriage, setIsOpenTriage] = useState(false);
+  const [isOpenOrden, setIsOpenOrden] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const [ultimoTriage, setUltimoTriage] = useState(null);
+  const [idMedico, setIdMedico] = useState(null);
+  const [formData, setFormData] = useState({
+    id_paciente: "",
+    id_medico: "",
+    descripcion: "",
+    observaciones: "",
+  });
 
   useEffect(() => {
     fetchPatients();
@@ -29,8 +39,63 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
     }
   };
 
+  useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const parts = token.split(".");
+        const payload = parts[1];
+        const decodedPayload = atob(payload);
+        const decodedToken = JSON.parse(decodedPayload);
+        setIdMedico(decodedToken.id_usuario);
+      }
+    }, []);
+  
+    useEffect(() => {
+      if (idMedico) {
+        console.log(`Hola soy el medico con el id: ${idMedico}`);
+      }
+    }, [idMedico]);
+
   const handlePageClick = ({ selected: selectedPage }) => {
     setCurrentPage(selectedPage);
+  };
+
+  const handleOpenTriage = async (patient) => {
+    try {
+      const ultimoTriage = await getUltimoTriage(patient.id);
+      setUltimoTriage(ultimoTriage);
+      setSelectedPatient(patient);
+      setIsOpenTriage(true);
+    } catch (error) {
+      console.error("Error fetching triage:", error);
+    }
+  };
+
+  const handleOpenOrdenMedica = (patient) => {
+    setSelectedPatient(patient);
+    setFormData({ ...formData, id_paciente: patient.id, id_medico: idMedico });
+    setIsOpenOrden(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createOrdenMedica(formData);
+      setIsOpenOrden(false);
+      setFormData({
+        id_paciente: "",
+        id_medico: "",
+        fecha_y_hora: "",
+        descripcion: "",
+        observaciones: "",
+      });
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -158,7 +223,7 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
                     onClick={() => {
                       getUltimoTriage(patient.id).then((ultimoTriage) => {
                         setUltimoTriage(ultimoTriage);
-                        setIsOpen(true);
+                        handleOpenTriage(patient);
                       });
                     }}
                     style={{
@@ -172,130 +237,307 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
                   >
                     Ver Ultimo Triage
                   </button>
-                  {isOpen && (
-                   <Modal
-                   isOpen={isOpen}
-                   onRequestClose={() => setIsOpen(false)}
-                   style={{
-                     overlay: {
-                       backgroundColor: "rgba(0, 0, 0, 0.5)",
-                     },
-                     content: {
-                       width: "700px",
-                       maxHeight: "90vh",
-                       margin: "auto",
-                       padding: "20px",
-                       borderRadius: "10px",
-                       boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
-                       overflow: "auto",
-                     },
-                   }}
-                 >
-                   <h2
-                     style={{
-                       textAlign: "center",
-                       marginBottom: "20px",
-                       fontSize: "24px",
-                       fontWeight: "bold",
-                       color: "#333",
-                     }}
-                   >
-                     Último Triage
-                   </h2>
-                 
-                   <div
-                     style={{
-                       display: "flex",
-                       flexWrap: "wrap",
-                       gap: "20px",
-                     }}
-                   >
-                     {ultimoTriage &&
-                       Object.entries(ultimoTriage).map(([key, value]) => {
-                         // Ocultar IDs del triage, paciente y enfermero
-                         if (
-                           key === "id_triage" ||
-                           key === "id_paciente" ||
-                           key === "id_enfermero"
-                         )
-                           return null;
-                 
-                         // Convertir claves en etiquetas legibles
-                         const label = key
-                           .replace(/_/g, " ")
-                           .replace(/\b\w/g, (char) => char.toUpperCase());
-                 
-                         return (
-                           <div
-                             key={key}
-                             style={{
-                               flex: "1 1 calc(50% - 10px)",
-                               marginBottom: "10px",
-                             }}
-                           >
-                             <label
-                               style={{
-                                 display: "block",
-                                 fontSize: "14px",
-                                 fontWeight: "bold",
-                                 color: "#555",
-                                 marginBottom: "5px",
-                               }}
-                             >
-                               {label}:
-                             </label>
-                             <div
-                               style={{
-                                 fontSize: "16px",
-                                 color: "#333",
-                                 backgroundColor: "#f5f5f5",
-                                 padding: "12px",
-                                 borderRadius: "5px",
-                                 border: "1px solid #ddd",
-                               }}
-                             >
-                               {value}
-                             </div>
-                           </div>
-                         );
-                       })}
-                   </div>
-                 
-                   <div style={{ textAlign: "center", marginTop: "20px" }}>
-                     <button
-                       onClick={() => setIsOpen(false)}
-                       style={{
-                         backgroundColor: "#007bff",
-                         color: "#fff",
-                         border: "none",
-                         borderRadius: "5px",
-                         padding: "12px 20px",
-                         fontSize: "16px",
-                         cursor: "pointer",
-                       }}
-                     >
-                       Cerrar
-                     </button>
-                   </div>
-                 </Modal>
-                 
+                  {isOpenTriage && (
+                    <Modal
+                      isOpen={isOpenTriage}
+                      onRequestClose={() => setIsOpenTriage(false)}
+                      style={{
+                        overlay: {
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                        content: {
+                          width: "700px",
+                          maxHeight: "90vh",
+                          margin: "auto",
+                          padding: "20px",
+                          borderRadius: "10px",
+                          boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                          overflow: "auto",
+                        },
+                      }}
+                    >
+                      <h2
+                        style={{
+                          textAlign: "center",
+                          marginBottom: "20px",
+                          fontSize: "24px",
+                          fontWeight: "bold",
+                          color: "#333",
+                        }}
+                      >
+                        Último Triage
+                      </h2>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "20px",
+                        }}
+                      >
+                        {ultimoTriage &&
+                          Object.entries(ultimoTriage).map(([key, value]) => {
+                            // Ocultar IDs del triage, paciente y enfermero
+                            if (
+                              key === "id_triage" ||
+                              key === "id_paciente" ||
+                              key === "id_enfermero"
+                            )
+                              return null;
+
+                            // Convertir claves en etiquetas legibles
+                            const label = key
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (char) => char.toUpperCase());
+
+                            return (
+                              <div
+                                key={key}
+                                style={{
+                                  flex: "1 1 calc(50% - 10px)",
+                                  marginBottom: "10px",
+                                }}
+                              >
+                                <label
+                                  style={{
+                                    display: "block",
+                                    fontSize: "14px",
+                                    fontWeight: "bold",
+                                    color: "#555",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  {label}:
+                                </label>
+                                <div
+                                  style={{
+                                    fontSize: "16px",
+                                    color: "#333",
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "12px",
+                                    borderRadius: "5px",
+                                    border: "1px solid #ddd",
+                                  }}
+                                >
+                                  {value}
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+
+                      <div style={{ textAlign: "center", marginTop: "20px" }}>
+                        <button
+                          onClick={() => setIsOpenTriage(false)}
+                          style={{
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "5px",
+                            padding: "12px 20px",
+                            fontSize: "16px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Cerrar
+                        </button>
+                      </div>
+                    </Modal>
                   )}
                   <button
-                    onClick={() => {
-                      setSelectedPatient(patient);
-                      setModalIsOpen(true);
-                    }}
+                    onClick={() => handleOpenOrdenMedica(patient)}
                     style={{
                       backgroundColor: "#4c2882",
                       color: "white",
                       border: "none",
-                      padding: "5px 10px",
+                      padding: "8px 12px",
                       cursor: "pointer",
-                      borderRadius: "4px",
+                      borderRadius: "5px",
+                      fontSize: "14px",
                     }}
                   >
-                    Crear Orden Medica
+                    Crear Orden Médica
                   </button>
+                  <Modal
+                    isOpen={isOpenOrden}
+                    onRequestClose={() => setIsOpenOrden(false)}
+                    style={{
+                      overlay: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+                      content: {
+                        width: "700px",
+                        maxHeight: "90vh",
+                        margin: "auto",
+                        padding: "20px",
+                        borderRadius: "10px",
+                        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+                        overflow: "auto",
+                      },
+                    }}
+                  >
+                    <h2
+                      style={{
+                        textAlign: "center",
+                        marginBottom: "20px",
+                        fontSize: "24px",
+                        fontWeight: "bold",
+                        color: "#333",
+                      }}
+                    >
+                      Crear Orden Médica
+                    </h2>
+                    <form onSubmit={handleSubmit}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "15px",
+                          marginBottom: "20px",
+                        }}
+                      >
+                        <div>
+                          <label
+                            style={{
+                              display: "block",
+                              marginBottom: "5px",
+                              fontWeight: "bold",
+                              color: "#555",
+                            }}
+                          >
+                            ID Paciente:
+                          </label>
+                          <input
+                            type="text"
+                            name="id_paciente"
+                            value={formData.id_paciente}
+                            onChange={handleChange}
+                            required
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "5px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            style={{
+                              display: "block",
+                              marginBottom: "5px",
+                              fontWeight: "bold",
+                              color: "#555",
+                            }}
+                          >
+                            ID Médico:
+                          </label>
+                          <input
+                            type="text"
+                            name="id_medico"
+                            value={formData.id_medico}
+                            onChange={handleChange}
+                            required
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "5px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            style={{
+                              display: "block",
+                              marginBottom: "5px",
+                              fontWeight: "bold",
+                              color: "#555",
+                            }}
+                          >
+                            Fecha y Hora:
+                          </label>
+                          <input
+                            type="datetime-local"
+                            name="fecha_y_hora"
+                            value={new Date().toISOString().slice(0, 16)}
+                            onChange={handleChange}
+                            required
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "5px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            style={{
+                              display: "block",
+                              marginBottom: "5px",
+                              fontWeight: "bold",
+                              color: "#555",
+                            }}
+                          >
+                            Descripción:
+                          </label>
+                          <input
+                            type="text"
+                            name="descripcion"
+                            value={formData.descripcion}
+                            onChange={handleChange}
+                            required
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "5px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            style={{
+                              display: "block",
+                              marginBottom: "5px",
+                              fontWeight: "bold",
+                              color: "#555",
+                            }}
+                          >
+                            Observaciones:
+                          </label>
+                          <input
+                            type="text"
+                            name="observaciones"
+                            value={formData.observaciones}
+                            onChange={handleChange}
+                            required
+                            style={{
+                              width: "100%",
+                              padding: "10px",
+                              borderRadius: "5px",
+                              border: "1px solid #ddd",
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "center" }}>
+                        <button
+                          type="submit"
+                          style={{
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: "5px",
+                            padding: "12px 20px",
+                            fontSize: "16px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Enviar
+                        </button>
+                      </div>
+                    </form>
+                  </Modal>
                 </td>
               </tr>
             ))}

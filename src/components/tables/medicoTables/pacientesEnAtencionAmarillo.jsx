@@ -22,7 +22,6 @@ const PacienteTriageAmarillo = ({ drawerOpen }) => {
     id_paciente: "",
     id_medico: "",
     descripcion: "",
-    estado: "",
     observaciones: "",
   });
 
@@ -86,8 +85,8 @@ const PacienteTriageAmarillo = ({ drawerOpen }) => {
       setFormData({
         id_paciente: "",
         id_medico: "",
+        fecha_y_hora: "",
         descripcion: "",
-        estado: "",
         observaciones: "",
       });
     } catch (error) {
@@ -454,12 +453,12 @@ const PacienteTriageAmarillo = ({ drawerOpen }) => {
                               color: "#555",
                             }}
                           >
-                            Descripción:
+                            Fecha y Hora:
                           </label>
                           <input
-                            type="text"
-                            name="descripcion"
-                            value={formData.descripcion}
+                            type="datetime-local"
+                            name="fecha_y_hora"
+                            value={new Date().toISOString().slice(0, 16)}
                             onChange={handleChange}
                             required
                             style={{
@@ -479,12 +478,12 @@ const PacienteTriageAmarillo = ({ drawerOpen }) => {
                               color: "#555",
                             }}
                           >
-                            Estado:
+                            Descripción:
                           </label>
                           <input
                             type="text"
-                            name="estado"
-                            value={formData.estado}
+                            name="descripcion"
+                            value={formData.descripcion}
                             onChange={handleChange}
                             required
                             style={{
