@@ -7,6 +7,8 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
   const [patients, setPatients] = useState([]);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchPatients();
@@ -20,6 +22,21 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
     } catch (error) {
       console.error("Error fetching patients:", error);
     }
+  };
+
+  const handleViewOrder = async (patientId) => {
+    try {
+      const order = await getUltimaOrdenMedicaPorPaciente(patientId);
+      setSelectedOrder(order);
+      setShowModal(true);
+    } catch (error) {
+      console.error("Error fetching order:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedOrder(null);
   };
 
   const handlePageClick = ({ selected: selectedPage }) => {
@@ -46,76 +63,13 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Nombre
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Apellido
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              DNI
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Teléfono
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Email
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Fecha de nacimiento
-            </th>
-            <th
-              style={{
-                backgroundColor: "#007bff",
-                color: "white",
-                padding: "10px",
-                textAlign: "left",
-              }}
-            >
-              Acciones
-            </th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Nombre</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Apellido</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>DNI</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Teléfono</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Email</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Fecha de nacimiento</th>
+            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -128,27 +82,15 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                   backgroundColor: patient.id % 2 === 0 ? "#f2f2f2" : "white",
                 }}
               >
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.nombre}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.apellido}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.dni}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.telefono}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.email}
-                </td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  {patient.fecha_nacimiento}
-                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.nombre}</td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.apellido}</td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.dni}</td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.telefono}</td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.email}</td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.fecha_nacimiento}</td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
-                    onClick={() => getUltimaOrdenMedicaPorPaciente(patient.id)}
+                    onClick={() => handleViewOrder(patient.id)}
                     style={{
                       backgroundColor: "#28a745",
                       color: "white",
@@ -220,6 +162,55 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
           }
         `}
       </style>
+
+      {showModal && selectedOrder && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "white",
+            padding: "20px",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+            borderRadius: "8px",
+            zIndex: 1000,
+          }}
+        >
+          <h3>Orden Médica</h3>
+          <p><strong>Fecha y Hora:</strong> {selectedOrder.fecha_y_hora}</p>
+          <p><strong>Descripción:</strong> {selectedOrder.descripcion}</p>
+          <p><strong>Observaciones:</strong> {selectedOrder.observaciones}</p>
+          <button
+            onClick={handleCloseModal}
+            style={{
+              backgroundColor: "#dc3545",
+              color: "white",
+              border: "none",
+              padding: "5px 10px",
+              cursor: "pointer",
+              borderRadius: "4px",
+            }}
+          >
+            Cerrar
+          </button>
+        </div>
+      )}
+
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 999,
+          }}
+          onClick={handleCloseModal}
+        />
+      )}
     </div>
   );
 };
