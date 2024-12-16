@@ -89,19 +89,38 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.email}</td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.fecha_nacimiento}</td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  <button
-                    onClick={() => handleViewOrder(patient.id)}
-                    style={{
-                      backgroundColor: "#28a745",
-                      color: "white",
-                      border: "none",
-                      padding: "5px 10px",
-                      cursor: "pointer",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    Ver Orden Medica
-                  </button>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <button
+                      onClick={() => handleViewOrder(patient.id)}
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        flex: 1,
+                        marginRight: "5px",
+                      }}
+                    >
+                      Ver Orden Medica
+                    </button>
+                    <button
+                      onClick={() => handleViewOrder(patient.id)}
+                      style={{
+                        backgroundColor: "blue",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        cursor: "pointer",
+                        borderRadius: "4px",
+                        flex: 1,
+                        marginLeft: "5px",
+                      }}
+                    >
+                      Dar evolucion del Paciente
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
