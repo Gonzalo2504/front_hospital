@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getPacientesAtendidos } from "../../../api/endpoints/enfermero/estadoPacientes";
+import { getPacientesConOrdenMedicaCreada } from "../../../api/endpoints/enfermero/estadoPacientes";
+import { getUltimaOrdenMedicaPorPaciente } from "../../../api/endpoints/enfermero/ordenesMedicasEnf";
 import ReactPaginate from "react-paginate";
 
 const PacienteAtendidoTable = ({ drawerOpen }) => {
@@ -13,7 +14,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
 
   const fetchPatients = async () => {
     try {
-      const response = await getPacientesAtendidos();
+      const response = await getPacientesConOrdenMedicaCreada();
       setPatients(response);
       setPageCount(Math.ceil(response.length / 10));
     } catch (error) {
@@ -147,7 +148,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   <button
-                    onClick={() => handleEdit(patient)}
+                    onClick={() => getUltimaOrdenMedicaPorPaciente(patient.id)}
                     style={{
                       backgroundColor: "#28a745",
                       color: "white",

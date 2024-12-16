@@ -21,3 +21,17 @@ export const getPacientesAtendidos = async () => {
   const response = await api.get("/pacientes/en_tratamiento/lista", config);
   return response.data;
 };
+
+export const getPacientesConOrdenMedicaCreada = async () => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.get(
+    "/pacientes/orden-medica-creada/lista",
+    config
+  );
+  return response.data;
+};
