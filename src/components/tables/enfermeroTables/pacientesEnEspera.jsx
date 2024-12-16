@@ -48,7 +48,7 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
     const formData = new FormData(event.target);
 
     const triageData = {
-      id_paciente: formData.get("paciente_id") || null,
+      id_paciente: formData.get("paciente_id"),
       id_enfermero: idEnfermero,
       fecha_y_hora: formData.get("fecha_y_hora") || null,
       clasificacion: formData.get("clasificacion") || null,
@@ -67,7 +67,9 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
 
     try {
       const response = await createTriage(triageData);
-      console.log(response);
+      console.log(
+        '@router.post("/triages", response_model=TriageRead) def create_triage(triage: TriageCreate, db: Session = Depends(get_db), current_user: Usuario = Depends(get_user_by_role([3]))): try: new_triage = TriageCreate(id_paciente=triage.id_paciente, id_enfermero=triage.id_enfermero, fecha_y_hora=triage.fecha_y_hora, clasificacion=triage.clasificacion, antecedentes=triage.antecedentes, frecuencia_cardiaca=triage.frecuencia_cardiaca, presion_arterial_sistolica=triage.presion_arterial_sistolica, presion_arterial_diastolica=triage.presion_arterial_diastolica, temperatura=triage.temperatura, frecuencia_respiratoria=triage.frecuencia_respiratoria, saturacion_oxigeno=triage.saturacion_oxigeno, motivo_consulta=triage.motivo_consulta, observaciones=triage.observaciones) except ValueError as e: key = str(e).split("\'", 2)[1] raise HTTPException(status_code=400, detail=f"Valor invalido para {key}") from e return crud_triage.create_triage(db=db, triage=new_triage)'
+      );
       fetchPatients();
     } catch (error) {
       console.error("Error creando triage:", error);
@@ -224,12 +226,22 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
           },
         }}
       >
-
         <form
           onSubmit={realizarTriage}
           style={{ maxHeight: "100%", overflow: "auto" }}
         >
           <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+            <input
+              type="hidden"
+              name="paciente_id"
+              value={selectedPatient ? selectedPatient.id : ""}
+            />
+            <input
+              type="hidden"
+              name="id_enfermero"
+              value={idEnfermero}
+            />
+
             {/* Fecha y Hora */}
             <div style={{ flex: "1 1 calc(50% - 10px)" }}>
               <label>
@@ -387,23 +399,23 @@ const PacienteEnEsperaTable = ({ drawerOpen }) => {
               </label>
             </div>
 
-          <button
-            type="submit"
-            style={{
-              display: "block",
-              width: "100%",
-              padding: "15px",
-              backgroundColor: "#007BFF",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              marginTop: "20px",
-              fontSize: "16px",
-            }}
-          >
-            Crear Triage
-          </button>
+            <button
+              type="submit"
+              style={{
+                display: "block",
+                width: "100%",
+                padding: "15px",
+                backgroundColor: "#007BFF",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                marginTop: "20px",
+                fontSize: "16px",
+              }}
+            >
+              Crear Triage
+            </button>
           </div>
         </form>
       </Modal>

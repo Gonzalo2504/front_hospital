@@ -280,6 +280,22 @@ const PacienteTriageVerde = ({ drawerOpen }) => {
                  </Modal>
                  
                   )}
+                  <button
+                    onClick={() => {
+                      setSelectedPatient(patient);
+                      setModalIsOpen(true);
+                    }}
+                    style={{
+                      backgroundColor: "#4c2882",
+                      color: "white",
+                      border: "none",
+                      padding: "5px 10px",
+                      cursor: "pointer",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    Crear Orden Medica
+                  </button>
                 </td>
               </tr>
             ))}
