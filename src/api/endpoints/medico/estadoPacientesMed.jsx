@@ -55,3 +55,14 @@ export const getUltimaEvolucionPaciente = async (pacienteId) => {
   const response = await api.get(`/pacientes/${pacienteId}/ultima-evolucion`, config);
   return response.data;
 };
+
+export const createEvento = async (evento) => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.post("/eventos/", evento, config);
+  return response.data;
+};

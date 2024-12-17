@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   getPacientesConEvolucionDeEnfermeria,
   getUltimaEvolucionPaciente,
+  createEvento,
 } from "../../../api/endpoints/medico/estadoPacientesMed";
 import ReactPaginate from "react-paginate";
 import Modal from "react-modal";
@@ -13,8 +14,16 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [isOpenEvolucion, setIsOpenEvolucion] = useState(false);
+  const [isOpenEvento, setIsOpenEvento] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [ultimoEvolucion, setUltimoEvolucion] = useState(null);
+  const [evento, setEvento] = useState({
+    tipo_evento: "",
+    fecha_hora: new Date(),
+    observaciones: "",
+    paciente_id: null,
+    medico_id: null,
+  });
 
   useEffect(() => {
     fetchPatients();
@@ -42,6 +51,26 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
       setIsOpenEvolucion(true);
     } catch (error) {
       console.error("Error fetching evolucion:", error);
+    }
+  };
+
+  const handleOpenEvento = (patient) => {
+    setSelectedPatient(patient);
+    setEvento({
+      ...evento,
+      paciente_id: patient.id,
+    });
+    setIsOpenEvento(true);
+  };
+
+  const handleSubmitEvento = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await createEvento(evento);
+      console.log("Evento creado:", response.data);
+      setIsOpenEvento(false);
+    } catch (error) {
+      console.error("Error creando evento:", error);
     }
   };
 
@@ -95,7 +124,13 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
                     onClick={() => handleOpenEvolucion(patient)}
                     style={buttonStyle}
                   >
-                    Ver Evolución del Paciente
+                    Ver Evolución
+                  </button>
+                  <button
+                    onClick={() => handleOpenEvento(patient)}
+                    style={{ ...buttonStyle, marginLeft: "10px" }}
+                  >
+                    Crear Evento
                   </button>
                 </td>
               </tr>
@@ -145,102 +180,80 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
         ) : (
           <p>No hay evolución disponible para este paciente.</p>
         )}
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <button
-            onClick={() => setIsOpenEvolucion(false)}
-            style={{
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              padding: "10px 20px",
-              cursor: "pointer",
-            }}
-          >
-            Cerrar
-          </button>
-        </div>
+        <button
+          onClick={() => setIsOpenEvolucion(false)}
+          style={{
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            padding: "10px 20px",
+            cursor: "pointer",
+          }}
+        >
+          Cerrar
+        </button>
       </Modal>
 
-      <div
-        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      {/* Modal para crear un evento */}
+      <Modal
+        isOpen={isOpenEvento}
+        onRequestClose={() => setIsOpenEvento(false)}
+        style={{
+          overlay: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+          content: {
+            width: "400px",
+            margin: "auto",
+            padding: "20px",
+            borderRadius: "10px",
+            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+          },
+        }}
       >
-        <ReactPaginate
-          previousLabel={"<"}
-          nextLabel={">"}
-          breakLabel={"..."}
-          breakClassName={"break-me"}
-          pageCount={pageCount}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-          pageClassName={"page-item"}
-          pageLinkClassName={"page-link"}
-          previousClassName={"page-item"}
-          previousLinkClassName={"page-link"}
-          nextClassName={"page-item"}
-          nextLinkClassName={"page-link"}
-          breakLinkClassName={"page-link"}
-          renderOnZeroPageCount={null}
-        />
-      </div>
-      <style>
-        {`
-          .pagination {
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            align-items: center;
-          }
-          .page-item {
-            margin: 0 5px;
-          }
-          .page-link {
-            padding: 10px 15px;
-            border: 1px solid #007bff;
-            border-radius: 4px;
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
-          }
-          .page-link:hover {
-            background-color: #007bff;
-            color: white;
-          }
-          .active .page-link {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-          }
-        `}
-      </style>
+        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+          Crear Evento
+        </h2>
+        <form onSubmit={handleSubmitEvento}>
+          <label>Tipo de evento:</label>
+          <input
+            type="text"
+            value={evento.tipo_evento}
+            onChange={(e) =>
+              setEvento({ ...evento, tipo_evento: e.target.value })
+            }
+          />
+          <label>Fecha y hora:</label>
+          <input
+            type="datetime-local"
+            value={evento.fecha_hora.toISOString().slice(0, 16)}
+            onChange={(e) =>
+              setEvento({ ...evento, fecha_hora: new Date(e.target.value) })
+            }
+          />
+          <label>Observaciones:</label>
+          <textarea
+            value={evento.observaciones}
+            onChange={(e) =>
+              setEvento({ ...evento, observaciones: e.target.value })
+            }
+          />
+          <button type="submit">Crear</button>
+        </form>
+      </Modal>
+
+      <ReactPaginate
+        previousLabel={"<"}
+        nextLabel={">"}
+        pageCount={pageCount}
+        onPageChange={handlePageClick}
+        containerClassName={"pagination"}
+      />
     </div>
   );
 };
 
-// Estilos
-const headerStyle = {
-  backgroundColor: "#007bff",
-  color: "white",
-  padding: "10px",
-  textAlign: "left",
-};
-
-const cellStyle = {
-  padding: "10px",
-  border: "1px solid #ddd",
-};
-
-const buttonStyle = {
-  backgroundColor: "#28a745",
-  color: "white",
-  border: "none",
-  padding: "5px 10px",
-  cursor: "pointer",
-  borderRadius: "4px",
-};
+const headerStyle = { backgroundColor: "#007bff", color: "white" };
+const cellStyle = { padding: "10px" };
+const buttonStyle = { padding: "5px 10px", cursor: "pointer" };
 
 export default PacienteEvoluciones;
