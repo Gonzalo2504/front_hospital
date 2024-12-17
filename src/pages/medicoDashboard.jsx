@@ -3,6 +3,7 @@ import PersistentDrawerLeft from '../components/navs/medicoNav';
 import PacienteTriageVerde from '../components/tables/medicoTables/pacientesEnAtencionVerde';
 import PacienteTriageAmarillo from '../components/tables/medicoTables/pacientesEnAtencionAmarillo';
 import PacienteTriageRojo from '../components/tables/medicoTables/pacientesEnAtencionRojo';
+import PacienteEvoluciones from '../components/tables/medicoTables/pacientesEvoluciones';
 import { useNavigate } from 'react-router-dom';
 
 function App() {
@@ -26,6 +27,8 @@ function App() {
         return <PacienteTriageAmarillo drawerOpen={drawerOpen} />;
       case 'Codigo Verde':
         return <PacienteTriageVerde drawerOpen={drawerOpen} />;
+      case 'Evoluciones':
+          return <PacienteEvoluciones drawerOpen={drawerOpen} />;
       case 'Cerrar Sesion':
         localStorage.removeItem('token');
         navigate('/');

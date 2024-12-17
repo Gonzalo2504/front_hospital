@@ -54,7 +54,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function PersistentDrawerLeft({ onMenuSelect, open, toggleSidebar }) {
   const theme = useTheme();
 
-  const menuItems = ['Codigo Rojo', 'Codigo Amarillo', 'Codigo Verde', 'Cerrar Sesion'];
+  const menuItems = ['Codigo Rojo', 'Codigo Amarillo', 'Codigo Verde', 'Evoluciones','Cerrar Sesion'];
 
   return (
     <Box sx={{ display: 'flex', color: 'darkgray' }}>
@@ -117,6 +117,8 @@ export default function PersistentDrawerLeft({ onMenuSelect, open, toggleSidebar
                   ) : index === 1 ? (
                     <img src="../assets/icono_paciente.png" width={30} height={30} />
                   ) : index === 2 ? (
+                    <img src="../assets/icono_paciente.png" width={30} height={30} />
+                  ) : index === 3 ? (
                     <img src="../assets/icono_paciente.png" width={30} height={30} />
                   ) : (
                     <img src="../assets/logout-variant.png" width={30} height={30} />

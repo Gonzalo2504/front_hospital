@@ -114,6 +114,7 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
       await createEvolucionPaciente(evolutionDataConFecha);
       alert("Evolución creada exitosamente");
       handleCloseModalEvol();
+      fetchPatients(); // Fetch patients after successful creation
     } catch (error) {
       console.error("Error creating evolution:", error);
       alert("Error al crear la evolución");

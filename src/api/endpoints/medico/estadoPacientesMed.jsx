@@ -33,3 +33,25 @@ export const createOrdenMedica = async (ordenData) => {
   const response = await api.post("/ordenes_medicas/", ordenData, config);
   return response.data;
 };
+
+export const getPacientesConEvolucionDeEnfermeria = async () => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.get("/pacientes/con-evolucion-de-enfermeria/lista", config);
+  return response.data;
+};
+
+export const getUltimaEvolucionPaciente = async (pacienteId) => {
+  const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const response = await api.get(`/pacientes/${pacienteId}/ultima-evolucion`, config);
+  return response.data;
+};
