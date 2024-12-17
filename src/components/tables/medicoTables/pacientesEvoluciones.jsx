@@ -16,6 +16,7 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
   const [isOpenEvolucion, setIsOpenEvolucion] = useState(false);
   const [isOpenEvento, setIsOpenEvento] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [idMedico, setIdMedico] = useState(null);
   const [ultimoEvolucion, setUltimoEvolucion] = useState(null);
   const [evento, setEvento] = useState({
     tipo_evento: "",
@@ -39,6 +40,23 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const parts = token.split(".");
+      const payload = parts[1];
+      const decodedPayload = atob(payload);
+      const decodedToken = JSON.parse(decodedPayload);
+      setIdMedico(decodedToken.id_usuario);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (idMedico) {
+      console.log(`Hola soy el medico con el id: ${idMedico}`);
+    }
+  }, [idMedico]);
+
   const handlePageClick = ({ selected: selectedPage }) => {
     setCurrentPage(selectedPage);
   };
@@ -59,9 +77,73 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
     setEvento({
       ...evento,
       paciente_id: patient.id,
+      medico_id: idMedico,
     });
     setIsOpenEvento(true);
   };
+
+  useEffect(() => {
+    // Actualiza las observaciones dependiendo del tipo_evento seleccionado
+    switch (evento.tipo_evento) {
+      case "Internacion":
+        setEvento((prev) => ({
+          ...prev,
+          observaciones: `
+            Diagnóstico principal: [Indicar diagnóstico aquí]
+            Diagnósticos secundarios: [Indicar diagnósticos secundarios aquí]
+            Signos vitales: [Indicar signos vitales aquí]
+            Motivo de la internación: [Indicar motivo aquí]
+            Tratamiento planificado: [Indicar tratamiento aquí]
+            Riesgos identificados: [Indicar riesgos aquí]
+          `,
+        }));
+        break;
+      case "Alta Medica":
+        setEvento((prev) => ({
+          ...prev,
+          observaciones: `
+            Mejora clínica: [Describir evolución favorable]
+            Tratamiento al alta: [Indicar tratamiento aquí]
+            Fecha de la próxima consulta: [Indicar fecha aquí]
+            Instrucciones al paciente y/o familia: [Indicar instrucciones aquí]
+          `,
+        }));
+        break;
+      case "Tratamiento Ambulatorio":
+        setEvento((prev) => ({
+          ...prev,
+          observaciones: `
+            Diagnóstico: [Indicar diagnóstico aquí]
+            Tratamiento prescrito: [Indicar tratamiento aquí]
+            Frecuencia de las visitas: [Indicar frecuencia aquí]
+            Instrucciones al paciente: [Indicar instrucciones aquí]
+          `,
+        }));
+        break;
+      case "Turno con especialista":
+        setEvento((prev) => ({
+          ...prev,
+          observaciones: `
+            Especialidad: [Indicar especialidad aquí]
+            Motivo de la consulta: [Indicar motivo aquí]
+            Preguntas específicas para el especialista: [Indicar preguntas aquí]
+          `,
+        }));
+        break;
+      case "Referencia a otro servicio":
+        setEvento((prev) => ({
+          ...prev,
+          observaciones: `
+            Servicio al que se refiere: [Indicar servicio aquí]
+            Motivo de la referencia: [Indicar motivo aquí]
+            Instrucciones para el servicio de destino: [Indicar instrucciones aquí]
+          `,
+        }));
+        break;
+      default:
+        setEvento((prev) => ({ ...prev, observaciones: "" }));
+    }
+  }, [evento.tipo_evento]);
 
   const handleSubmitEvento = async (e) => {
     e.preventDefault();
@@ -215,13 +297,24 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
         </h2>
         <form onSubmit={handleSubmitEvento}>
           <label>Tipo de evento:</label>
-          <input
-            type="text"
+          <select
             value={evento.tipo_evento}
             onChange={(e) =>
               setEvento({ ...evento, tipo_evento: e.target.value })
             }
-          />
+          >
+            <option value="Internacion">Internacion</option>
+            <option value="Alta Medica">Alta Medica</option>
+            <option value="Tratamiento Ambulatorio">
+              Tratamiento Ambulatorio
+            </option>
+            <option value="Turno con especialista">
+              Turno con especialista
+            </option>
+            <option value="Referencia a otro servicio">
+              Referencia a otro servicio
+            </option>
+          </select>
           <label>Fecha y hora:</label>
           <input
             type="datetime-local"
@@ -241,13 +334,61 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
         </form>
       </Modal>
 
-      <ReactPaginate
-        previousLabel={"<"}
-        nextLabel={">"}
-        pageCount={pageCount}
-        onPageChange={handlePageClick}
-        containerClassName={"pagination"}
-      />
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      >
+        <ReactPaginate
+          previousLabel={"<"}
+          nextLabel={">"}
+          breakLabel={"..."}
+          breakClassName={"break-me"}
+          pageCount={pageCount}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName={"pagination"}
+          activeClassName={"active"}
+          pageClassName={"page-item"}
+          pageLinkClassName={"page-link"}
+          previousClassName={"page-item"}
+          previousLinkClassName={"page-link"}
+          nextClassName={"page-item"}
+          nextLinkClassName={"page-link"}
+          breakLinkClassName={"page-link"}
+          renderOnZeroPageCount={null}
+        />
+      </div>
+      <style>
+        {`
+          .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            align-items: center;
+          }
+          .page-item {
+            margin: 0 5px;
+          }
+          .page-link {
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+          }
+          .page-link:hover {
+            background-color: #007bff;
+            color: white;
+          }
+          .active .page-link {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+          }
+        `}
+      </style>
     </div>
   );
 };
