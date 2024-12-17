@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getPacientesConOrdenMedicaCreada } from "../../../api/endpoints/enfermero/estadoPacientes";
-import { getUltimaOrdenMedicaPorPaciente, createEvolucionPaciente } from "../../../api/endpoints/enfermero/ordenesMedicasEnf";
+import {
+  getUltimaOrdenMedicaPorPaciente,
+  createEvolucionPaciente,
+} from "../../../api/endpoints/enfermero/ordenesMedicasEnf";
 import ReactPaginate from "react-paginate";
 
 const PacienteAtendidoTable = ({ drawerOpen }) => {
@@ -18,6 +21,8 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
     descripcion: "",
     fecha_y_hora: "",
   });
+  const [idEnfermero, setIdEnfermero] = useState(null);
+  const [previousSelectedOrder, setPreviousSelectedOrder] = useState(null);
 
   useEffect(() => {
     fetchPatients();
@@ -43,8 +48,26 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const parts = token.split(".");
+      const payload = parts[1];
+      const decodedPayload = atob(payload);
+      const decodedToken = JSON.parse(decodedPayload);
+      setIdEnfermero(decodedToken.id_usuario);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (idEnfermero) {
+      console.log(`Hola soy el enfermero con el id: ${idEnfermero}`);
+    }
+  }, [idEnfermero]);
+
   const handleCloseModal = () => {
     setShowModal(false);
+    setPreviousSelectedOrder(selectedOrder);
     setSelectedOrder(null);
   };
 
@@ -57,6 +80,8 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
     setEvolutionData((prev) => ({
       ...prev,
       id_paciente: patient.id,
+      id_orden_medica: previousSelectedOrder.id,
+      id_enfermero: idEnfermero,
     }));
     setShowModal(true);
   };
@@ -83,10 +108,12 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const fechaYHoraActual = new Date().toISOString().slice(0, 16);
+    const evolutionDataConFecha = { ...evolutionData, fecha_y_hora: fechaYHoraActual };
     try {
-      await createEvolucionPaciente(evolutionData);
+      await createEvolucionPaciente(evolutionDataConFecha);
       alert("Evolución creada exitosamente");
-      handleCloseModal();
+      handleCloseModalEvol();
     } catch (error) {
       console.error("Error creating evolution:", error);
       alert("Error al crear la evolución");
@@ -113,13 +140,69 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
       >
         <thead>
           <tr>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Nombre</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Apellido</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>DNI</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Teléfono</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Email</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Fecha de nacimiento</th>
-            <th style={{ backgroundColor: "#007bff", color: "white", padding: "10px" }}>Acciones</th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Nombre
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Apellido
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              DNI
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Teléfono
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Email
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Fecha de nacimiento
+            </th>
+            <th
+              style={{
+                backgroundColor: "#007bff",
+                color: "white",
+                padding: "10px",
+              }}
+            >
+              Acciones
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -132,14 +215,28 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
                   backgroundColor: patient.id % 2 === 0 ? "#f2f2f2" : "white",
                 }}
               >
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.nombre}</td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.apellido}</td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.dni}</td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.telefono}</td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.email}</td>
-                <td style={{ padding: "10px", border: "1px solid #ddd" }}>{patient.fecha_nacimiento}</td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  {patient.nombre}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.apellido}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.dni}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.telefono}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.email}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {patient.fecha_nacimiento}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <button
                       onClick={() => handleViewOrder(patient.id)}
                       style={{
@@ -250,9 +347,15 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
           }}
         >
           <h3>Orden Médica</h3>
-          <p><strong>Fecha y Hora:</strong> {selectedOrder.fecha_y_hora}</p>
-          <p><strong>Descripción:</strong> {selectedOrder.descripcion}</p>
-          <p><strong>Observaciones:</strong> {selectedOrder.observaciones}</p>
+          <p>
+            <strong>Fecha y Hora:</strong> {selectedOrder.fecha_y_hora}
+          </p>
+          <p>
+            <strong>Descripción:</strong> {selectedOrder.descripcion}
+          </p>
+          <p>
+            <strong>Observaciones:</strong> {selectedOrder.observaciones}
+          </p>
           <button
             onClick={handleCloseModal}
             style={{
@@ -299,7 +402,31 @@ const PacienteAtendidoTable = ({ drawerOpen }) => {
         >
           <h3>Crear Evolución</h3>
           <form onSubmit={handleSubmit}>
-            <label>Descripción</label>
+            <label>ID Orden Médica:</label>
+            <input
+              type="text"
+              name="id_orden_medica"
+              value={evolutionData.id_orden_medica}
+              onChange={handleInputChange}
+            />
+            <br />
+            <label>ID Paciente:</label>
+            <input
+              type="text"
+              name="id_paciente"
+              value={evolutionData.id_paciente}
+              onChange={handleInputChange}
+            />
+            <br />
+            <label>ID Enfermero:</label>
+            <input
+              type="text"
+              name="id_enfermero"
+              value={evolutionData.id_enfermero}
+              onChange={handleInputChange}
+            />
+            <br />
+            <label>Descripción:</label>
             <textarea
               name="descripcion"
               value={evolutionData.descripcion}

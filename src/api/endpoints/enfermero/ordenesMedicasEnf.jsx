@@ -18,6 +18,6 @@ export const createEvolucionPaciente = async (evolucionPaciente) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const response = await api.post("/ordenes_medicas/evolucion_paciente/", evolucionPaciente, config);
+  const response = await api.post("/evolucion_paciente/", evolucionPaciente, config);
   return response.data;
 };
