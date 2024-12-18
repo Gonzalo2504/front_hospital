@@ -54,7 +54,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function PersistentDrawerLeft({ onMenuSelect, open, toggleSidebar }) {
   const theme = useTheme();
 
-  const menuItems = ['Pacientes', 'Medicos', 'Enfermeros', 'Cerrar Sesion'];
+  const menuItems = ['Pacientes', 'Medicos', 'Enfermeros', 'Informes', 'Cerrar Sesion'];
 
   return (
     <Box sx={{ display: 'flex', color: 'darkgray' }}>

@@ -82,62 +82,64 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
     setIsOpenEvento(true);
   };
 
+  const cleanText = (text) => text.replace(/^\s+/gm, "").trim();
+
   useEffect(() => {
     // Actualiza las observaciones dependiendo del tipo_evento seleccionado
     switch (evento.tipo_evento) {
       case "Internacion":
         setEvento((prev) => ({
           ...prev,
-          observaciones: `
+          observaciones: cleanText(`
             Diagnóstico principal: [Indicar diagnóstico aquí]
             Diagnósticos secundarios: [Indicar diagnósticos secundarios aquí]
             Signos vitales: [Indicar signos vitales aquí]
             Motivo de la internación: [Indicar motivo aquí]
             Tratamiento planificado: [Indicar tratamiento aquí]
             Riesgos identificados: [Indicar riesgos aquí]
-          `,
+          `),
         }));
         break;
       case "Alta Medica":
         setEvento((prev) => ({
           ...prev,
-          observaciones: `
+          observaciones: cleanText(`
             Mejora clínica: [Describir evolución favorable]
             Tratamiento al alta: [Indicar tratamiento aquí]
             Fecha de la próxima consulta: [Indicar fecha aquí]
             Instrucciones al paciente y/o familia: [Indicar instrucciones aquí]
-          `,
+          `),
         }));
         break;
       case "Tratamiento Ambulatorio":
         setEvento((prev) => ({
           ...prev,
-          observaciones: `
+          observaciones: cleanText(`
             Diagnóstico: [Indicar diagnóstico aquí]
             Tratamiento prescrito: [Indicar tratamiento aquí]
             Frecuencia de las visitas: [Indicar frecuencia aquí]
             Instrucciones al paciente: [Indicar instrucciones aquí]
-          `,
+          `),
         }));
         break;
       case "Turno con especialista":
         setEvento((prev) => ({
           ...prev,
-          observaciones: `
+          observaciones: cleanText(`
             Especialidad: [Indicar especialidad aquí]
             Motivo de la consulta: [Indicar motivo aquí]
             Preguntas específicas para el especialista: [Indicar preguntas aquí]
-          `,
+          `),
         }));
         break;
       case "Referencia a otro servicio":
         setEvento((prev) => ({
           ...prev,
-          observaciones: `
+          observaciones: cleanText(`
             Servicio al que se refiere: [Indicar servicio aquí]
             Motivo de la referencia: [Indicar motivo aquí]
             Instrucciones para el servicio de destino: [Indicar instrucciones aquí]
-          `,
+          `),
         }));
         break;
       default:
@@ -151,6 +153,7 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
       const response = await createEvento(evento);
       console.log("Evento creado:", response.data);
       setIsOpenEvento(false);
+      fetchPatients(); // Fetch patients after successful creation
     } catch (error) {
       console.error("Error creando evento:", error);
     }
@@ -225,19 +228,38 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
         isOpen={isOpenEvolucion}
         onRequestClose={() => setIsOpenEvolucion(false)}
         style={{
-          overlay: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo oscuro
+            display: "flex",
+            alignItems: "center", // Alinea verticalmente
+            justifyContent: "center", // Alinea horizontalmente
+          },
           content: {
             width: "600px",
-            margin: "auto",
-            padding: "20px",
-            borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+            padding: "25px",
+            borderRadius: "12px",
+            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)", // Sombra pronunciada
+            border: "none", // Sin borde
+            backgroundColor: "#f9f9f9", // Fondo gris claro
+            position: "relative", // Elimina ajustes por defecto
+            inset: "auto", // Elimina posicionamiento automático de react-modal
+            maxHeight: "80vh", // Evita desbordes verticales
+            overflowY: "auto", // Scroll si es necesario
           },
         }}
       >
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+        <h2
+          style={{
+            textAlign: "center",
+            marginBottom: "20px",
+            color: "#333",
+            fontSize: "24px",
+            fontWeight: "600",
+          }}
+        >
           Evolución del Paciente
         </h2>
+
         {ultimoEvolucion ? (
           <div>
             {Object.entries(ultimoEvolucion).map(([key, value]) => {
@@ -253,28 +275,54 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
                 .replace(/\b\w/g, (char) => char.toUpperCase());
 
               return (
-                <div key={key} style={{ marginBottom: "10px" }}>
-                  <strong>{label}:</strong> {value}
+                <div
+                  key={key}
+                  style={{
+                    marginBottom: "12px",
+                    padding: "8px 12px",
+                    backgroundColor: "#fff",
+                    border: "1px solid #ddd",
+                    borderRadius: "6px",
+                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <strong style={{ color: "#555" }}>{label}:</strong>{" "}
+                  <span style={{ color: "#333" }}>{value}</span>
                 </div>
               );
             })}
           </div>
         ) : (
-          <p>No hay evolución disponible para este paciente.</p>
+          <p style={{ textAlign: "center", color: "#888" }}>
+            No hay evolución disponible para este paciente.
+          </p>
         )}
-        <button
-          onClick={() => setIsOpenEvolucion(false)}
+
+        <div
           style={{
-            backgroundColor: "#007bff",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            padding: "10px 20px",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "20px",
           }}
         >
-          Cerrar
-        </button>
+          <button
+            onClick={() => setIsOpenEvolucion(false)}
+            style={{
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 20px",
+              fontSize: "16px",
+              cursor: "pointer",
+              transition: "background-color 0.3s ease",
+            }}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
+          >
+            Cerrar
+          </button>
+        </div>
       </Modal>
 
       {/* Modal para crear un evento */}
@@ -284,24 +332,37 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
         style={{
           overlay: { backgroundColor: "rgba(0, 0, 0, 0.5)" },
           content: {
-            width: "400px",
+            width: "60vw",
+            height: "80vh",
             margin: "auto",
-            padding: "20px",
+            padding: "30px",
             borderRadius: "10px",
-            boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "0 0 15px rgba(0, 0, 0, 0.2)",
+            display: "flex",
+            flexDirection: "column",
           },
         }}
       >
         <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
           Crear Evento
         </h2>
-        <form onSubmit={handleSubmitEvento}>
-          <label>Tipo de evento:</label>
+        <form
+          onSubmit={handleSubmitEvento}
+          style={{ display: "flex", flexDirection: "column", flex: 1 }}
+        >
+          <label style={{ marginBottom: "10px" }}>Tipo de evento:</label>
           <select
             value={evento.tipo_evento}
             onChange={(e) =>
               setEvento({ ...evento, tipo_evento: e.target.value })
             }
+            style={{
+              padding: "8px",
+              marginBottom: "20px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
           >
             <option value="Internacion">Internacion</option>
             <option value="Alta Medica">Alta Medica</option>
@@ -315,22 +376,57 @@ const PacienteEvoluciones = ({ drawerOpen }) => {
               Referencia a otro servicio
             </option>
           </select>
-          <label>Fecha y hora:</label>
+
+          <label style={{ marginBottom: "10px" }}>Fecha y hora:</label>
           <input
             type="datetime-local"
             value={evento.fecha_hora.toISOString().slice(0, 16)}
             onChange={(e) =>
               setEvento({ ...evento, fecha_hora: new Date(e.target.value) })
             }
+            style={{
+              padding: "8px",
+              marginBottom: "20px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
           />
-          <label>Observaciones:</label>
+
+          <label style={{ marginBottom: "10px" }}>Observaciones:</label>
           <textarea
             value={evento.observaciones}
             onChange={(e) =>
               setEvento({ ...evento, observaciones: e.target.value })
             }
+            style={{
+              padding: "0",
+              textAlign: "start",
+              verticalAlign: "top",
+              resize: "none",
+              width: "100%",
+              height: "200px",
+              fontSize: "16px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
           />
-          <button type="submit">Crear</button>
+
+          <button
+            type="submit"
+            style={{
+              marginTop: "20px",
+              padding: "10px",
+              fontSize: "18px",
+              backgroundColor: "#007BFF",
+              color: "white",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            Crear
+          </button>
         </form>
       </Modal>
 
